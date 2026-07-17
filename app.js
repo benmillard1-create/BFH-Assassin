@@ -119,10 +119,13 @@ async function loadGame(){
  ]);
  if(pe||be||ee)return msg((pe||be||ee).message,true);
  $("missionPlayerName").textContent=p?.name||session.playerName;
+ if($("sidePlayerName")) $("sidePlayerName").textContent=p?.name||session.playerName;
+ if($("gameCodeDisplay")) $("gameCodeDisplay").textContent=session.code||"------";
  const hasMission=!!m;$("missionWaiting").classList.toggle("hidden",hasMission);$("missionDetails").classList.toggle("hidden",!hasMission);
  if(m){$("targetName").textContent=m.players?.name||"Unknown";$("objectName").textContent=m.object_name;$("roomName").textContent=m.room_name}
  const completed=!!m?.completed;const ghost=p?.status==="ghost";
  $("missionStatusBadge").textContent=completed?"COMPLETE":ghost?"GHOST":"ACTIVE";
+ if($("sideStatus")) $("sideStatus").textContent=completed?"✓ Mission complete":ghost?"● Ghost":"● Active";
  $("missionHint").textContent=completed?"Your mission is complete.":ghost?"You are a ghost, but your mission is still active.":"Keep this screen private.";
  $("missionCompleteBtn").classList.toggle("hidden",!m||completed);
  const b=$("statusBoard");b.innerHTML="";(board||[]).forEach(x=>{const li=document.createElement("li"),n=document.createElement("span"),s=document.createElement("small");n.className="name";n.textContent=x.name;s.textContent=x.mission_completed?"✅ Mission complete":x.status==="ghost"?"👻 Ghost":"🟢 Alive";li.append(n,s);b.append(li)});
@@ -203,7 +206,8 @@ function init(){
  $("leaveGameBtn").onclick=logout;
  $("hideMissionBtn").onclick=switchPlayer;
  $("missionCompleteBtn").onclick=completeMission;
- document.querySelectorAll("[data-floor-plan]").forEach(button=>button.onclick=openFloorPlan);
+ document.querySelectorAll("[data-floor-plan]").forEach(button=>{button.onclick=openFloorPlan;button.onkeydown=event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openFloorPlan()}}});
+ document.querySelectorAll("[data-open-tab]").forEach(button=>button.onclick=()=>{if(!session?.gameId)return;openGame();setTimeout(()=>document.querySelector(`.tab[data-tab="${button.dataset.openTab}"]`)?.click(),0)});
  $("closeFloorPlanBtn").onclick=closeFloorPlan;
  $("floorPlanModal").onclick=event=>{if(event.target.id==="floorPlanModal")closeFloorPlan()};
  document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("floorPlanModal").classList.contains("hidden"))closeFloorPlan()});

@@ -3,179 +3,151 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#07111f" />
+  <meta name="theme-color" content="#050505" />
   <title>BFH Assassin</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="shell">
-    <header class="brand">
-      <div class="logo">🎯</div>
-      <div>
-        <h1>BFH Assassin</h1>
-        <p>One mission. No second chances.</p>
-      </div>
+  <div class="appFrame">
+    <header class="topBar">
+      <button type="button" class="brandButton" data-home aria-label="BFH Assassin home">
+        <span class="targetLogo">◎</span>
+        <span>BFH ASSASSIN</span>
+      </button>
+      <nav class="topNav" aria-label="Game navigation">
+        <button type="button" class="navItem" data-home><span>⌂</span> Home</button>
+        <button type="button" class="navItem" data-open-tab="missionPanel"><span>⌖</span> Mission</button>
+        <button type="button" class="navItem" data-open-tab="feedPanel"><span>☷</span> Events</button>
+        <button type="button" class="navItem" data-open-tab="boardPanel"><span>♙</span> Players</button>
+      </nav>
+      <button type="button" data-floor-plan class="floorPlanTopButton">▱ Floor Plan</button>
     </header>
 
-    <section id="message" class="message hidden" role="status"></section>
+    <main class="shell">
+      <section id="message" class="message hidden" role="status"></section>
 
-    <section id="homeView" class="view">
-      <div class="card hero">
-        <span class="eyebrow">CLASSIFIED ACCESS</span>
-        <h2>Choose your operation</h2>
-        <button type="button" id="showCreateBtn" class="primary">Create game</button>
-        <button type="button" id="showJoinBtn" class="secondary">Join game</button>
-        <button type="button" id="showLoginBtn" class="secondary">Player login</button>
-      </div>
-    </section>
+      <section id="homeView" class="view authView">
+        <div class="authBrand">
+          <span class="targetMark">◎</span>
+          <span class="eyebrow">LUD BROOK MANOR</span>
+          <h1>One mission.<br>No second chances.</h1>
+          <p>Create a game, invite your agents and keep your mission secret.</p>
+        </div>
+        <div class="card hero">
+          <span class="eyebrow">CLASSIFIED ACCESS</span>
+          <h2>Choose your operation</h2>
+          <button type="button" id="showCreateBtn" class="primary">Create game</button>
+          <button type="button" id="showJoinBtn" class="secondary">Join game</button>
+          <button type="button" id="showLoginBtn" class="secondary">Player login</button>
+        </div>
+      </section>
 
-    <section id="createView" class="view hidden">
-      <div class="card">
-        <button type="button" class="backLink" data-home>← Back</button>
-        <span class="eyebrow">HOST CONTROL</span>
-        <h2>Create a game</h2>
-        <label for="hostName">Host name</label>
-        <input id="hostName" maxlength="40" placeholder="e.g. Dad" autocomplete="name" />
-        <label for="hostPin">Choose a 4-digit PIN</label>
-        <input id="hostPin" maxlength="4" inputmode="numeric" placeholder="1234" />
-        <button type="button" id="createGameBtn" class="primary">Create game</button>
-      </div>
-    </section>
+      <section id="createView" class="view authView hidden">
+        <div class="authBrand compact"><span class="targetMark">◎</span><h1>Host Control</h1><p>Set up a new operation.</p></div>
+        <div class="card formCard">
+          <button type="button" class="backLink" data-home>← Back</button>
+          <span class="eyebrow">HOST CONTROL</span><h2>Create a game</h2>
+          <label for="hostName">Host name</label><input id="hostName" maxlength="40" placeholder="e.g. Dad" autocomplete="name" />
+          <label for="hostPin">Choose a 4-digit PIN</label><input id="hostPin" maxlength="4" inputmode="numeric" placeholder="1234" />
+          <button type="button" id="createGameBtn" class="primary">Create game</button>
+        </div>
+      </section>
 
-    <section id="joinView" class="view hidden">
-      <div class="card">
-        <button type="button" class="backLink" data-home>← Back</button>
-        <span class="eyebrow">NEW AGENT</span>
-        <h2>Join a game</h2>
-        <label for="joinCode">Game code</label>
-        <input id="joinCode" maxlength="6" placeholder="ABC123" autocapitalize="characters" />
-        <label for="playerName">Your name</label>
-        <input id="playerName" maxlength="40" placeholder="e.g. Sarah" autocomplete="name" />
-        <label for="playerPin">Choose a 4-digit PIN</label>
-        <input id="playerPin" maxlength="4" inputmode="numeric" placeholder="1234" />
-        <button type="button" id="joinGameBtn" class="primary">Join game</button>
-      </div>
-    </section>
+      <section id="joinView" class="view authView hidden">
+        <div class="authBrand compact"><span class="targetMark">◎</span><h1>New Agent</h1><p>Join an operation already in progress.</p></div>
+        <div class="card formCard">
+          <button type="button" class="backLink" data-home>← Back</button>
+          <span class="eyebrow">NEW AGENT</span><h2>Join a game</h2>
+          <label for="joinCode">Game code</label><input id="joinCode" maxlength="6" placeholder="ABC123" autocapitalize="characters" />
+          <label for="playerName">Your name</label><input id="playerName" maxlength="40" placeholder="e.g. Sarah" autocomplete="name" />
+          <label for="playerPin">Choose a 4-digit PIN</label><input id="playerPin" maxlength="4" inputmode="numeric" placeholder="1234" />
+          <button type="button" id="joinGameBtn" class="primary">Join game</button>
+        </div>
+      </section>
 
-    <section id="loginView" class="view hidden">
-      <div class="card">
-        <button type="button" class="backLink" data-home>← Back</button>
-        <span class="eyebrow">RETURNING AGENT</span>
-        <h2>Open your mission</h2>
-        <label for="loginCode">Game code</label>
-        <input id="loginCode" maxlength="6" placeholder="ABC123" autocapitalize="characters" />
-        <label for="loginName">Your name</label>
-        <input id="loginName" maxlength="40" placeholder="e.g. Sarah" />
-        <label for="loginPin">Your 4-digit PIN</label>
-        <input id="loginPin" maxlength="4" inputmode="numeric" placeholder="1234" />
-        <button type="button" id="loginBtn" class="primary">Open mission</button>
-      </div>
-    </section>
+      <section id="loginView" class="view authView hidden">
+        <div class="authBrand compact"><span class="targetMark">◎</span><h1>Returning Agent</h1><p>Unlock your private mission.</p></div>
+        <div class="card formCard">
+          <button type="button" class="backLink" data-home>← Back</button>
+          <span class="eyebrow">RETURNING AGENT</span><h2>Open your mission</h2>
+          <label for="loginCode">Game code</label><input id="loginCode" maxlength="6" placeholder="ABC123" autocapitalize="characters" />
+          <label for="loginName">Your name</label><input id="loginName" maxlength="40" placeholder="e.g. Sarah" />
+          <label for="loginPin">Your 4-digit PIN</label><input id="loginPin" maxlength="4" inputmode="numeric" placeholder="1234" />
+          <button type="button" id="loginBtn" class="primary">Open mission</button>
+        </div>
+      </section>
 
-    <section id="lobbyView" class="view hidden">
-      <div class="card">
-        <div class="lobbyTop">
-          <div>
-            <span class="eyebrow">WAITING ROOM</span>
-            <h2>BFH Assassin</h2>
+      <section id="lobbyView" class="view dashboard hidden">
+        <aside class="sidePanel">
+          <span class="sideLabel">GAME CODE</span>
+          <button id="copyCodeBtn" class="sideCode" type="button"><span id="lobbyCode">------</span><small>Tap to copy</small></button>
+          <div class="statusLine"><span class="statusDot"></span> Waiting for players</div>
+          <div class="sideDivider"></div>
+          <div class="sideHeading"><span>AGENTS</span><strong id="playerCount">0</strong></div>
+          <ul id="playerList" class="sidePlayerList"></ul>
+          <button type="button" data-floor-plan class="goldOutline">▱ View Floor Plan</button>
+          <button type="button" id="switchPlayerBtn" class="darkButton">Switch player</button>
+          <button type="button" id="leaveGameBtn" class="textDanger">Log out</button>
+        </aside>
+        <section class="contentPanel">
+          <div class="contentHeading"><div><span class="eyebrow">WAITING ROOM</span><h2>Ludbrook Manor</h2><p>Share the game code and wait for all agents to join.</p></div><span id="roleBadge" class="badge">PLAYER</span></div>
+          <div class="floorPlanPreview" data-floor-plan role="button" tabindex="0" aria-label="Open Ludbrook Manor floor plan">
+            <img src="floor-plan.jpeg" alt="Ground-floor plan of Ludbrook Manor and the Stables" />
+            <div class="previewOverlay"><span>▱</span><strong>Tap to view floor plan</strong><small>Pinch to zoom when open</small></div>
           </div>
-          <span id="roleBadge" class="badge">PLAYER</span>
-        </div>
+          <div class="lobbyActions">
+            <button type="button" id="startGameBtn" class="primary hidden">Deal secret missions</button>
+            <p id="waitingText" class="waiting">Waiting for the host to begin…</p>
+          </div>
+        </section>
+      </section>
 
-        <p class="muted">Share this code:</p>
-        <button id="copyCodeBtn" class="codeBox" type="button">
-          <span id="lobbyCode">------</span>
-          <small>Tap to copy</small>
-        </button>
+      <section id="gameView" class="view dashboard hidden">
+        <aside class="sidePanel">
+          <span class="sideLabel">GAME CODE</span><div class="staticCode" id="gameCodeDisplay">------</div>
+          <div class="statusLine"><span class="statusDot"></span> Game in progress</div>
+          <div class="sideDivider"></div>
+          <span class="sideLabel">YOUR AGENT</span><h3 id="sidePlayerName">Agent</h3>
+          <span class="sideLabel spaced">STATUS</span><div id="sideStatus" class="roleDisplay">● Active</div>
+          <button type="button" data-floor-plan class="goldOutline">▱ View Floor Plan</button>
+          <button type="button" id="hideMissionBtn" class="darkButton">Hide / switch player</button>
+        </aside>
+        <section class="contentPanel">
+          <nav class="tabs">
+            <button type="button" class="tab active" data-tab="missionPanel">⌖ My mission</button>
+            <button type="button" class="tab" data-tab="boardPanel">♙ Status board</button>
+            <button type="button" class="tab" data-tab="feedPanel">☷ Event feed</button>
+          </nav>
 
-        <div class="divider"></div>
-        <div class="listHeader">
-          <h3>Agents joined</h3>
-          <span id="playerCount">0</span>
-        </div>
-        <ul id="playerList" class="playerList"></ul>
-
-        <button type="button" data-floor-plan class="secondary floorPlanButton">🗺️ View house floor plan</button>
-        <button type="button" id="startGameBtn" class="primary hidden">Deal secret missions</button>
-        <p id="waitingText" class="waiting">Waiting for the host to begin…</p>
-        <button type="button" id="switchPlayerBtn" class="secondary">Switch player</button>
-        <button type="button" id="leaveGameBtn" class="secondary danger">Leave game on this device</button>
-      </div>
-    </section>
-
-    <section id="gameView" class="view hidden">
-      <nav class="tabs">
-        <button type="button" class="tab active" data-tab="missionPanel">My mission</button>
-        <button type="button" class="tab" data-tab="boardPanel">Status board</button>
-        <button type="button" class="tab" data-tab="feedPanel">Event feed</button>
-      </nav>
-
-      <section id="missionPanel" class="panel">
-        <div class="card">
-          <div class="lobbyTop">
-            <div>
-              <span class="eyebrow">PRIVATE FILE</span>
-              <h2 id="missionPlayerName">Agent</h2>
+          <section id="missionPanel" class="panel">
+            <div class="contentHeading"><div><span class="eyebrow">PRIVATE FILE</span><h2 id="missionPlayerName">Agent</h2><p>Keep this screen private.</p></div><span id="missionStatusBadge" class="badge">ACTIVE</span></div>
+            <div id="missionWaiting" class="emptyState hidden">Your mission has not been dealt yet.</div>
+            <div id="missionDetails" class="missionGrid">
+              <div class="missionBlock target"><small>TARGET</small><strong id="targetName">—</strong><span>Find your target discreetly</span></div>
+              <div class="missionBlock"><small>OBJECT</small><strong id="objectName">—</strong><span>Use this everyday object</span></div>
+              <div class="missionBlock"><small>LOCATION</small><strong id="roomName">—</strong><span>Complete the mission here</span></div>
             </div>
-            <span id="missionStatusBadge" class="badge">ACTIVE</span>
-          </div>
+            <div class="missionFooter"><p id="missionHint" class="waiting">Keep this screen private.</p><button type="button" id="missionCompleteBtn" class="primary hidden">Mission complete</button></div>
+          </section>
 
-          <div id="missionWaiting" class="emptyState hidden">
-            Your mission has not been dealt yet.
-          </div>
-
-          <div id="missionDetails">
-            <div class="missionBlock"><small>TARGET</small><strong id="targetName">—</strong></div>
-            <div class="missionBlock"><small>OBJECT</small><strong id="objectName">—</strong></div>
-            <div class="missionBlock"><small>ROOM</small><strong id="roomName">—</strong></div>
-          </div>
-
-          <p id="missionHint" class="waiting">Keep this screen private.</p>
-          <button type="button" data-floor-plan class="secondary floorPlanButton">🗺️ View house floor plan</button>
-          <button type="button" id="missionCompleteBtn" class="primary hidden">Mission complete</button>
-          <button type="button" id="hideMissionBtn" class="secondary">Hide mission / switch player</button>
-        </div>
+          <section id="boardPanel" class="panel hidden"><div class="contentHeading"><div><span class="eyebrow">PUBLIC INTELLIGENCE</span><h2>Status board</h2><p>Alive, Ghost and Mission Complete.</p></div></div><ul id="statusBoard" class="boardList"></ul></section>
+          <section id="feedPanel" class="panel hidden"><div class="contentHeading"><div><span class="eyebrow">LIVE UPDATES</span><h2>Event feed</h2><p>The latest activity from the operation.</p></div></div><ul id="eventFeed" class="feedList"></ul></section>
+        </section>
       </section>
-
-      <section id="boardPanel" class="panel hidden">
-        <div class="card">
-          <span class="eyebrow">PUBLIC INTELLIGENCE</span>
-          <h2>Status board</h2>
-          <ul id="statusBoard" class="playerList"></ul>
-        </div>
-      </section>
-
-      <section id="feedPanel" class="panel hidden">
-        <div class="card">
-          <span class="eyebrow">LIVE UPDATES</span>
-          <h2>Event feed</h2>
-          <ul id="eventFeed" class="feedList"></ul>
-        </div>
-      </section>
-    </section>
-    <p style="text-align:center;opacity:.45;font-size:12px;margin:12px 0">BFH Assassin v1.0</p>
-  </main>
-
+      <p class="version">BFH ASSASSIN v1.0</p>
+    </main>
+  </div>
 
   <div id="floorPlanModal" class="floorPlanModal hidden" role="dialog" aria-modal="true" aria-labelledby="floorPlanTitle">
     <div class="floorPlanWindow">
-      <div class="floorPlanHeader">
-        <div>
-          <span class="eyebrow">LOCATION GUIDE</span>
-          <h2 id="floorPlanTitle">Ludbrook Manor floor plan</h2>
-        </div>
-        <button type="button" id="closeFloorPlanBtn" class="closeFloorPlan" aria-label="Close floor plan">✕</button>
-      </div>
-      <p class="muted floorPlanHelp">Pinch to zoom, or rotate your iPad for a larger view.</p>
-      <div class="floorPlanScroller">
-        <img src="floor-plan.jpeg" alt="Ground-floor plan of Ludbrook Manor and the Stables" class="floorPlanImage" />
-      </div>
-      <p class="floorPlanNote">Outdoor mission areas: Driveway, Garden, Tennis Court, and Bridge over Pond.</p>
+      <div class="floorPlanHeader"><div><span class="eyebrow">LOCATION GUIDE</span><h2 id="floorPlanTitle">Ludbrook Manor</h2><p>Floor plan and outdoor mission areas</p></div><button type="button" id="closeFloorPlanBtn" class="closeFloorPlan" aria-label="Close floor plan">✕</button></div>
+      <div class="floorPlanScroller"><img src="floor-plan.jpeg" alt="Ground-floor plan of Ludbrook Manor and the Stables" class="floorPlanImage" /></div>
+      <div class="areaChips"><span>Driveway</span><span>Garden</span><span>Tennis Court</span><span>Bridge over Pond</span></div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=1.0.1"></script>
+  <script src="app.js?v=1.1.0"></script>
 </body>
 </html>
