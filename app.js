@@ -12,8 +12,8 @@ const sb=configured
  : null;
 const $=id=>document.getElementById(id);
 const views=["homeView","createView","joinView","loginView","lobbyView","gameView"];
-const objects=["Wooden spoon","Tea towel","Cushion","Mug","Book","Remote control","Sock","Coaster","Hairbrush","Water bottle","Oven glove","Tissue box"];
-const rooms=["Kitchen","Living room","Dining room","Hallway","Garden","Bedroom","Bathroom","Patio","Utility room"];
+const objects=["Wooden spoon","Tea towel","Cushion","Mug","Paperback book","TV remote","Coaster","Hairbrush","Water bottle","Oven glove","Tissue box","Pen","Pencil","Notebook","Plate","Bowl","Fork","Spoon","Hand towel","Umbrella","Tennis ball","Sunglasses","Keyring","Phone charger"];
+const rooms=["Butlers’ Kitchen","Main Kitchen","Breakfast Room","Main Hall","Drawing Room","Dining Room","Study","Snug","Inner Hall","Pantry","Wellness Complex","Swimming Pool","Stables Kitchen","Sitting Room","Portico","Driveway","Garden","Tennis Court","Bridge over Pond"];
 let session=JSON.parse(localStorage.getItem("bfh_session")||"null");
 let timer=null;
 
@@ -21,6 +21,8 @@ function showView(id){views.forEach(v=>$(v).classList.toggle("hidden",v!==id))}
 function msg(t,e=false,stay=false){const b=$("message");b.textContent=t;b.classList.toggle("error",e);b.classList.remove("hidden");if(!stay)setTimeout(()=>b.classList.add("hidden"),8000)}
 function save(s){session={...s,savedAt:new Date().toISOString()};localStorage.setItem("bfh_session",JSON.stringify(session))}
 function clear(){session=null;localStorage.removeItem("bfh_session")}
+function openFloorPlan(){const modal=$("floorPlanModal");modal.classList.remove("hidden");document.body.classList.add("modalOpen");$("closeFloorPlanBtn").focus()}
+function closeFloorPlan(){$("floorPlanModal").classList.add("hidden");document.body.classList.remove("modalOpen")}
 function validPin(v){return /^[0-9]{4}$/.test(v)}
 function randCode(){const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";return Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join("")}
 function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
@@ -201,6 +203,10 @@ function init(){
  $("leaveGameBtn").onclick=logout;
  $("hideMissionBtn").onclick=switchPlayer;
  $("missionCompleteBtn").onclick=completeMission;
+ document.querySelectorAll("[data-floor-plan]").forEach(button=>button.onclick=openFloorPlan);
+ $("closeFloorPlanBtn").onclick=closeFloorPlan;
+ $("floorPlanModal").onclick=event=>{if(event.target.id==="floorPlanModal")closeFloorPlan()};
+ document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("floorPlanModal").classList.contains("hidden"))closeFloorPlan()});
 
  document.querySelectorAll(".tab").forEach(tab=>{
   tab.onclick=()=>{

@@ -17,3 +17,12 @@ input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(52,211,153,.12)}
 .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px}.tab{min-height:42px;margin:0;padding:8px;border:1px solid var(--line);background:#0d1728;color:var(--muted);font-size:.78rem;font-weight:800}.tab.active{border-color:var(--green);color:var(--green)}
 .missionBlock{display:grid;gap:7px;margin:12px 0;padding:18px;border:1px solid var(--line);border-radius:15px;background:#0b1525}.missionBlock small{color:var(--green);font-weight:900;letter-spacing:.15em}.missionBlock strong{font-size:1.55rem}
 .emptyState{padding:24px;border:1px dashed var(--line);border-radius:14px;text-align:center;color:var(--muted)}.feedList li{display:block}.feedList time{display:block;margin-top:5px;color:var(--muted);font-size:.75rem}
+
+.floorPlanButton{margin-top:14px}
+.modalOpen{overflow:hidden}
+.floorPlanModal{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:14px;background:rgba(0,0,0,.82)}
+.floorPlanWindow{width:min(96vw,1100px);max-height:94vh;overflow:auto;padding:18px;border:1px solid var(--line);border-radius:18px;background:#f8fafc;color:#111827;box-shadow:0 25px 80px rgba(0,0,0,.55)}
+.floorPlanHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.floorPlanHeader h2{margin:5px 0 0}.floorPlanHeader .eyebrow{color:#047857}
+.closeFloorPlan{flex:0 0 48px;width:48px;min-height:48px;margin:0;border:1px solid #cbd5e1;background:#fff;color:#111827;font-weight:900}
+.floorPlanHelp{margin:8px 0 12px;color:#475569}.floorPlanScroller{overflow:auto;border:1px solid #d7dee8;border-radius:12px;background:#fff;-webkit-overflow-scrolling:touch}.floorPlanImage{display:block;width:100%;height:auto;min-width:760px}.floorPlanNote{margin:12px 2px 0;color:#334155;font-weight:700}
+@media (max-width:600px){.floorPlanModal{padding:7px}.floorPlanWindow{width:100%;max-height:97vh;padding:12px;border-radius:14px}.floorPlanHeader h2{font-size:1.25rem}.floorPlanImage{min-width:720px}}

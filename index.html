@@ -95,6 +95,7 @@
         </div>
         <ul id="playerList" class="playerList"></ul>
 
+        <button type="button" data-floor-plan class="secondary floorPlanButton">🗺️ View house floor plan</button>
         <button type="button" id="startGameBtn" class="primary hidden">Deal secret missions</button>
         <p id="waitingText" class="waiting">Waiting for the host to begin…</p>
         <button type="button" id="switchPlayerBtn" class="secondary">Switch player</button>
@@ -130,6 +131,7 @@
           </div>
 
           <p id="missionHint" class="waiting">Keep this screen private.</p>
+          <button type="button" data-floor-plan class="secondary floorPlanButton">🗺️ View house floor plan</button>
           <button type="button" id="missionCompleteBtn" class="primary hidden">Mission complete</button>
           <button type="button" id="hideMissionBtn" class="secondary">Hide mission / switch player</button>
         </div>
@@ -151,11 +153,29 @@
         </div>
       </section>
     </section>
-    <p style="text-align:center;opacity:.45;font-size:12px;margin:12px 0">Build 2.4</p>
+    <p style="text-align:center;opacity:.45;font-size:12px;margin:12px 0">BFH Assassin v1.0</p>
   </main>
+
+
+  <div id="floorPlanModal" class="floorPlanModal hidden" role="dialog" aria-modal="true" aria-labelledby="floorPlanTitle">
+    <div class="floorPlanWindow">
+      <div class="floorPlanHeader">
+        <div>
+          <span class="eyebrow">LOCATION GUIDE</span>
+          <h2 id="floorPlanTitle">Ludbrook Manor floor plan</h2>
+        </div>
+        <button type="button" id="closeFloorPlanBtn" class="closeFloorPlan" aria-label="Close floor plan">✕</button>
+      </div>
+      <p class="muted floorPlanHelp">Pinch to zoom, or rotate your iPad for a larger view.</p>
+      <div class="floorPlanScroller">
+        <img src="floor-plan.jpeg" alt="Ground-floor plan of Ludbrook Manor and the Stables" class="floorPlanImage" />
+      </div>
+      <p class="floorPlanNote">Outdoor mission areas: Driveway, Garden, Tennis Court, and Bridge over Pond.</p>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=2.4"></script>
+  <script src="app.js?v=1.0.1"></script>
 </body>
 </html>
