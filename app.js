@@ -43,7 +43,7 @@ function objectDisplayName(name){
  const icon=objectIcons[name]||"●";
  return `${icon} ${name}`;
 }
-const rooms=["Butlers’ Kitchen","Main Kitchen","Breakfast Room","Main Hall","Drawing Room","Dining Room","Study","Snug","Inner Hall","Pantry","Wellness Complex","Swimming Pool","Stables Kitchen","Sitting Room","Portico","Driveway","Garden","Tennis Court","Bridge over Pond"];
+const rooms=["Butlers’ Kitchen","Main Kitchen","Breakfast Room","Main Hall","Drawing Room","Dining Room","Study","Snug","Inner Hall","Pantry","Wellness Complex","Stables Kitchen","Sitting Room","Portico","Driveway","Garden","Tennis Court","Bridge over Pond"];
 let session=JSON.parse(localStorage.getItem("bfh_session")||"null");
 let timer=null;
 
@@ -162,7 +162,17 @@ async function loadGame(){
  if($("sideStatus")) $("sideStatus").textContent=completed?"✓ Mission complete":ghost?"● Ghost":"● Active";
  $("missionHint").textContent=completed?"Your mission is complete.":ghost?"You are a ghost, but your mission is still active.":"Keep this screen private.";
  $("missionCompleteBtn").classList.toggle("hidden",!m||completed);
- const b=$("statusBoard");b.innerHTML="";(board||[]).forEach(x=>{const li=document.createElement("li"),n=document.createElement("span"),s=document.createElement("small");n.className="name";n.textContent=x.name;s.textContent=x.mission_completed?"✅ Mission complete":x.status==="ghost"?"👻 Ghost":"🟢 Alive";li.append(n,s);b.append(li)});
+ const b=$("statusBoard");b.innerHTML="";(board||[]).forEach(x=>{
+  const li=document.createElement("li"),n=document.createElement("span"),statuses=document.createElement("span");
+  const life=document.createElement("small"),mission=document.createElement("small");
+  n.className="name";n.textContent=x.name;
+  statuses.className="statusIndicators";
+  life.className=x.status==="ghost"?"statusPill eliminated":"statusPill alive";
+  life.textContent=x.status==="ghost"?"👻 Ghost":"🟢 Alive";
+  mission.className=x.mission_completed?"statusPill complete":"statusPill pending";
+  mission.textContent=x.mission_completed?"🎯 Mission complete":"○ Mission pending";
+  statuses.append(life,mission);li.append(n,statuses);b.append(li)
+ });
  const f=$("eventFeed");f.innerHTML="";(events||[]).forEach(x=>{const li=document.createElement("li");li.textContent=x.message;const t=document.createElement("time");t.textContent=new Date(x.created_at).toLocaleString();li.append(t);f.append(li)});
 }
 
@@ -170,16 +180,17 @@ async function completeMission(event){
  event?.preventDefault();
  if(!confirm("Confirm that you completed your mission?"))return;
  try{
-  const {data:m,error:me}=await sb.from("missions").select("id,target_player_id,completed").eq("player_id",session.playerId).maybeSingle();if(me)throw me;if(!m||m.completed)throw Error("Mission is already complete");
+  const {data:m,error:me}=await sb.from("missions").select("id,target_player_id,completed,object_name,room_name").eq("player_id",session.playerId).maybeSingle();if(me)throw me;if(!m||m.completed)throw Error("Mission is already complete");
   const {data:k,error:ke}=await sb.from("players").select("name,status").eq("id",session.playerId).single();if(ke)throw ke;
   const {data:t,error:te}=await sb.from("players").select("name,status").eq("id",m.target_player_id).single();if(te)throw te;
   await sb.from("missions").update({completed:true,completed_at:new Date().toISOString()}).eq("id",m.id);
   await sb.from("players").update({mission_completed:true}).eq("id",session.playerId);
   if(t.status!=="ghost")await sb.from("players").update({status:"ghost",alive:false}).eq("id",m.target_player_id);
-  await sb.from("game_events").insert([
-   {game_id:session.gameId,event_type:"complete",message:`${k.name} completed their mission.`},
-   {game_id:session.gameId,event_type:"elimination",message:`${t.name} was eliminated and is now a Ghost.`}
-  ]);
+  await sb.from("game_events").insert({
+   game_id:session.gameId,
+   event_type:"elimination",
+   message:`${k.name} eliminated ${t.name} with the ${m.object_name} in the ${m.room_name}.`
+  });
   msg("Mission recorded.");loadGame();
  }catch(e){msg(e.message,true)}
 }

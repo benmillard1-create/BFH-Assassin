@@ -12,3 +12,12 @@
 .managerCard{max-width:760px}.managerResults{margin-top:24px;padding-top:22px;border-top:1px solid #30373e}.managerToolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}.managerToolbar>div{display:grid;gap:3px}.managerToolbar small,.managerNote{color:#9aa4aa}.dangerButton{width:auto;min-height:42px;padding:0 14px;border:1px solid #7c3431;background:#351716;color:#ffd3d0;font-weight:750}.dangerButton:disabled{opacity:.42;cursor:not-allowed}.managedGamesList{display:grid;gap:10px;padding:0;margin:0;list-style:none}.managedGame{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px;border:1px solid #30373e;border-radius:12px;background:#0a0f13}.managedGameInfo{display:grid;gap:5px}.managedGameInfo strong{color:var(--gold2);font-size:1.25rem;letter-spacing:.08em}.managedGameInfo small{color:#aab2b7}.managedGameActions{display:flex;gap:8px}.miniButton,.miniDanger{width:auto;min-height:38px;padding:0 11px;margin:0;border-radius:8px;font-size:.83rem;font-weight:750}.miniButton{border:1px solid #4b5257;background:#192126;color:#fff}.miniDanger{border:1px solid #7c3431;background:#351716;color:#ffd3d0}.managerEmpty{padding:20px;border:1px dashed #394149;border-radius:10px;color:#9aa4aa;text-align:center}.managerNote{margin:16px 0 0;font-size:.82rem;line-height:1.45}@media(max-width:620px){.managerToolbar,.managedGame{align-items:stretch;flex-direction:column}.dangerButton{width:100%}.managedGameActions{display:grid;grid-template-columns:1fr 1fr}.miniButton,.miniDanger{width:100%}}
 
 .fullDanger{width:100%;margin-top:22px;min-height:50px}.fullDanger:disabled{opacity:.55;cursor:wait}
+
+/* v1.6.2: Ghost status label and independent mission indicator */
+.statusIndicators{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:7px;margin-left:12px}
+.statusPill{display:inline-flex;align-items:center;white-space:nowrap;padding:5px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.14);font-size:.76rem;font-weight:700;line-height:1.1}
+.statusPill.alive{background:rgba(44,150,85,.14);color:#b8edc9;border-color:rgba(84,190,119,.32)}
+.statusPill.eliminated{background:rgba(145,45,45,.18);color:#f0b8b8;border-color:rgba(199,78,78,.38)}
+.statusPill.complete{background:rgba(198,156,66,.17);color:#f2d48d;border-color:rgba(218,176,85,.38)}
+.statusPill.pending{background:rgba(255,255,255,.055);color:#a9a9a9}
+@media(max-width:620px){.boardList li{align-items:flex-start}.statusIndicators{justify-content:flex-start;margin:8px 0 0;width:100%}}
