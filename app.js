@@ -12,38 +12,38 @@ const sb=configured
  : null;
 const $=id=>document.getElementById(id);
 const views=["homeView","createView","joinView","loginView","managerView","lobbyView","gameView"];
-const objects=["Mug","Glass","Plate","Bowl","Spoon","Tea towel","Cushion","Blanket","TV remote","Book","Towel","Hairbrush","Pen","Notebook","Phone charger","Torch","Umbrella","Shopping bag","Tennis ball","Playing card","Dice","Wooden spoon","Oven glove","Water bottle"];
+const objects=["Wooden spoon","Oven glove","Tea towel","Small cushion","TV remote","Paperback book","Hand towel","Hairbrush","Pen","Pack of tissues","Phone charger","Torch","Folded umbrella","Reusable shopping bag","Tennis ball","Playing card","Dice","Water bottle","Sock","Scarf","Hat","Sunglasses","Coaster","Toothbrush"];
 const objectIcons={
- "Mug":"☕",
- "Glass":"🥛",
- "Plate":"🍽️",
- "Bowl":"🥣",
- "Spoon":"🥄",
+ "Wooden spoon":"🥄",
+ "Oven glove":"🧤",
  "Tea towel":"🧻",
- "Cushion":"🛋️",
- "Blanket":"🧶",
+ "Small cushion":"🛋️",
  "TV remote":"📺",
- "Book":"📚",
- "Towel":"🧺",
+ "Paperback book":"📖",
+ "Hand towel":"🧺",
  "Hairbrush":"🪮",
  "Pen":"🖊️",
- "Notebook":"📓",
+ "Pack of tissues":"🧻",
  "Phone charger":"🔌",
  "Torch":"🔦",
- "Umbrella":"☂️",
- "Shopping bag":"🛍️",
+ "Folded umbrella":"☂️",
+ "Reusable shopping bag":"🛍️",
  "Tennis ball":"🎾",
  "Playing card":"🃏",
  "Dice":"🎲",
- "Wooden spoon":"🥄",
- "Oven glove":"🧤",
- "Water bottle":"🚰"
+ "Water bottle":"🚰",
+ "Sock":"🧦",
+ "Scarf":"🧣",
+ "Hat":"🎩",
+ "Sunglasses":"🕶️",
+ "Coaster":"⭕",
+ "Toothbrush":"🪥"
 };
 function objectDisplayName(name){
  const icon=objectIcons[name]||"●";
  return `${icon} ${name}`;
 }
-const rooms=["Butlers’ Kitchen","Main Kitchen","Breakfast Room","Main Hall","Drawing Room","Dining Room","Study","Snug","Inner Hall","Pantry","Wellness Complex","Stables Kitchen","Sitting Room","Portico","Driveway","Garden","Tennis Court","Bridge over Pond"];
+const rooms=["Butlers’ Kitchen","Main Kitchen","Breakfast Room","Main Hall","Drawing Room","Dining Room","Study","Snug","Inner Hall","Pantry","Wellness Complex","Hot Tub","Stables Kitchen","Sitting Room","Portico","Driveway","Garden","Tennis Court","Bridge over Pond"];
 let session=JSON.parse(localStorage.getItem("bfh_session")||"null");
 let timer=null;
 
