@@ -55,7 +55,22 @@ function openFloorPlan(){const modal=$("floorPlanModal");modal.classList.remove(
 function closeFloorPlan(){$("floorPlanModal").classList.add("hidden");document.body.classList.remove("modalOpen")}
 function validPin(v){return /^[0-9]{4}$/.test(v)}
 function randCode(){const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";return Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join("")}
-function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function shuffle(a){
+ const copy=[...a];
+ for(let i=copy.length-1;i>0;i--){
+  const j=Math.floor(Math.random()*(i+1));
+  [copy[i],copy[j]]=[copy[j],copy[i]];
+ }
+ return copy;
+}
+function dealUniqueUntilExhausted(pool,count){
+ const dealt=[];
+ while(dealt.length<count){
+  const cycle=shuffle(pool);
+  dealt.push(...cycle.slice(0,count-dealt.length));
+ }
+ return dealt;
+}
 async function uniqueCode(){for(let i=0;i<10;i++){const c=randCode();const {data,error}=await sb.from("games").select("id").eq("code",c).limit(1);if(error)throw error;if(!data.length)return c}throw Error("Could not create a unique code")}
 
 async function createGame(event){
@@ -132,7 +147,17 @@ async function dealMissions(event){
  try{
   const {data:ps,error:pe}=await sb.from("players").select("id,name").eq("game_id",session.gameId);if(pe)throw pe;
   if(ps.length<3)throw Error("At least 3 players are needed");
-  const ordered=shuffle(ps),rows=ordered.map((p,i)=>({game_id:session.gameId,player_id:p.id,target_player_id:ordered[(i+1)%ordered.length].id,object_name:objects[Math.floor(Math.random()*objects.length)],room_name:rooms[Math.floor(Math.random()*rooms.length)],completed:false}));
+  const ordered=shuffle(ps);
+  const dealtObjects=dealUniqueUntilExhausted(objects,ordered.length);
+  const dealtRooms=dealUniqueUntilExhausted(rooms,ordered.length);
+  const rows=ordered.map((p,i)=>({
+   game_id:session.gameId,
+   player_id:p.id,
+   target_player_id:ordered[(i+1)%ordered.length].id,
+   object_name:dealtObjects[i],
+   room_name:dealtRooms[i],
+   completed:false
+  }));
   const {error:me}=await sb.from("missions").insert(rows);if(me)throw me;
   const {error:ge}=await sb.from("games").update({status:"started",started_at:new Date().toISOString()}).eq("id",session.gameId);if(ge)throw ge;
   await sb.from("game_events").insert({game_id:session.gameId,event_type:"start",message:"The game has started. Secret missions have been assigned."});
