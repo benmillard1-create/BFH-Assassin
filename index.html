@@ -1,1 +1,160 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#07111f"><title>BFH Assassin</title><link rel="stylesheet" href="styles.css"></head><body><main class="shell"><header class="brand"><div class="logo">🎯</div><div><h1>BFH Assassin</h1><p>Family holiday mission game</p></div></header><section id="message" class="message hidden"></section><section id="homeView"><div class="card hero"><span class="eyebrow">CLASSIFIED ACCESS</span><h2>Choose your operation</h2><button id="showCreateBtn" class="primary">Create game</button><button id="showJoinBtn" class="secondary">Join game</button></div></section><section id="createView" class="hidden"><div class="card"><button class="back" data-back>← Back</button><span class="eyebrow">HOST CONTROL</span><h2>Create a game</h2><label>Your name</label><input id="hostName" maxlength="40" placeholder="e.g. Dad"><button id="createGameBtn" class="primary">Create game</button></div></section><section id="joinView" class="hidden"><div class="card"><button class="back" data-back>← Back</button><span class="eyebrow">FIELD AGENT</span><h2>Join a game</h2><label>Game code</label><input id="joinCode" maxlength="6" placeholder="ABC123"><label>Your name</label><input id="playerName" maxlength="40" placeholder="e.g. Sarah"><button id="joinGameBtn" class="primary">Join game</button></div></section><section id="lobbyView" class="hidden"><div class="card"><div class="row"><div><span class="eyebrow">WAITING ROOM</span><h2>BFH Assassin</h2></div><span id="roleBadge" class="badge">PLAYER</span></div><p class="muted">Share this code:</p><button id="copyCodeBtn" class="code"><span id="lobbyCode">------</span><small>Tap to copy</small></button><hr><div class="row"><h3>Agents joined</h3><span id="playerCount">0</span></div><ul id="playerList"></ul><p id="waitingText" class="muted">Waiting for the host to begin…</p><button id="startGameBtn" class="primary hidden">Start game</button><button id="leaveGameBtn" class="secondary danger">Leave lobby</button></div></section></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07111f" />
+  <title>BFH Assassin</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="brand">
+      <div class="logo">🎯</div>
+      <div>
+        <h1>BFH Assassin</h1>
+        <p>One mission. No second chances.</p>
+      </div>
+    </header>
+
+    <section id="message" class="message hidden" role="status"></section>
+
+    <section id="homeView" class="view">
+      <div class="card hero">
+        <span class="eyebrow">CLASSIFIED ACCESS</span>
+        <h2>Choose your operation</h2>
+        <button id="showCreateBtn" class="primary">Create game</button>
+        <button id="showJoinBtn" class="secondary">Join game</button>
+        <button id="showLoginBtn" class="secondary">Player login</button>
+      </div>
+    </section>
+
+    <section id="createView" class="view hidden">
+      <div class="card">
+        <button class="backLink" data-home>← Back</button>
+        <span class="eyebrow">HOST CONTROL</span>
+        <h2>Create a game</h2>
+        <label for="hostName">Host name</label>
+        <input id="hostName" maxlength="40" placeholder="e.g. Dad" autocomplete="name" />
+        <label for="hostPin">Choose a 4-digit PIN</label>
+        <input id="hostPin" maxlength="4" inputmode="numeric" placeholder="1234" />
+        <button id="createGameBtn" class="primary">Create game</button>
+      </div>
+    </section>
+
+    <section id="joinView" class="view hidden">
+      <div class="card">
+        <button class="backLink" data-home>← Back</button>
+        <span class="eyebrow">NEW AGENT</span>
+        <h2>Join a game</h2>
+        <label for="joinCode">Game code</label>
+        <input id="joinCode" maxlength="6" placeholder="ABC123" autocapitalize="characters" />
+        <label for="playerName">Your name</label>
+        <input id="playerName" maxlength="40" placeholder="e.g. Sarah" autocomplete="name" />
+        <label for="playerPin">Choose a 4-digit PIN</label>
+        <input id="playerPin" maxlength="4" inputmode="numeric" placeholder="1234" />
+        <button id="joinGameBtn" class="primary">Join game</button>
+      </div>
+    </section>
+
+    <section id="loginView" class="view hidden">
+      <div class="card">
+        <button class="backLink" data-home>← Back</button>
+        <span class="eyebrow">RETURNING AGENT</span>
+        <h2>Open your mission</h2>
+        <label for="loginCode">Game code</label>
+        <input id="loginCode" maxlength="6" placeholder="ABC123" autocapitalize="characters" />
+        <label for="loginName">Your name</label>
+        <input id="loginName" maxlength="40" placeholder="e.g. Sarah" />
+        <label for="loginPin">Your 4-digit PIN</label>
+        <input id="loginPin" maxlength="4" inputmode="numeric" placeholder="1234" />
+        <button id="loginBtn" class="primary">Open mission</button>
+      </div>
+    </section>
+
+    <section id="lobbyView" class="view hidden">
+      <div class="card">
+        <div class="lobbyTop">
+          <div>
+            <span class="eyebrow">WAITING ROOM</span>
+            <h2>BFH Assassin</h2>
+          </div>
+          <span id="roleBadge" class="badge">PLAYER</span>
+        </div>
+
+        <p class="muted">Share this code:</p>
+        <button id="copyCodeBtn" class="codeBox" type="button">
+          <span id="lobbyCode">------</span>
+          <small>Tap to copy</small>
+        </button>
+
+        <div class="divider"></div>
+        <div class="listHeader">
+          <h3>Agents joined</h3>
+          <span id="playerCount">0</span>
+        </div>
+        <ul id="playerList" class="playerList"></ul>
+
+        <button id="startGameBtn" class="primary hidden">Deal secret missions</button>
+        <p id="waitingText" class="waiting">Waiting for the host to begin…</p>
+        <button id="switchPlayerBtn" class="secondary">Switch player</button>
+        <button id="leaveGameBtn" class="secondary danger">Leave game on this device</button>
+      </div>
+    </section>
+
+    <section id="gameView" class="view hidden">
+      <nav class="tabs">
+        <button class="tab active" data-tab="missionPanel">My mission</button>
+        <button class="tab" data-tab="boardPanel">Status board</button>
+        <button class="tab" data-tab="feedPanel">Event feed</button>
+      </nav>
+
+      <section id="missionPanel" class="panel">
+        <div class="card">
+          <div class="lobbyTop">
+            <div>
+              <span class="eyebrow">PRIVATE FILE</span>
+              <h2 id="missionPlayerName">Agent</h2>
+            </div>
+            <span id="missionStatusBadge" class="badge">ACTIVE</span>
+          </div>
+
+          <div id="missionWaiting" class="emptyState hidden">
+            Your mission has not been dealt yet.
+          </div>
+
+          <div id="missionDetails">
+            <div class="missionBlock"><small>TARGET</small><strong id="targetName">—</strong></div>
+            <div class="missionBlock"><small>OBJECT</small><strong id="objectName">—</strong></div>
+            <div class="missionBlock"><small>ROOM</small><strong id="roomName">—</strong></div>
+          </div>
+
+          <p id="missionHint" class="waiting">Keep this screen private.</p>
+          <button id="missionCompleteBtn" class="primary hidden">Mission complete</button>
+          <button id="hideMissionBtn" class="secondary">Hide mission / switch player</button>
+        </div>
+      </section>
+
+      <section id="boardPanel" class="panel hidden">
+        <div class="card">
+          <span class="eyebrow">PUBLIC INTELLIGENCE</span>
+          <h2>Status board</h2>
+          <ul id="statusBoard" class="playerList"></ul>
+        </div>
+      </section>
+
+      <section id="feedPanel" class="panel hidden">
+        <div class="card">
+          <span class="eyebrow">LIVE UPDATES</span>
+          <h2>Event feed</h2>
+          <ul id="eventFeed" class="feedList"></ul>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
