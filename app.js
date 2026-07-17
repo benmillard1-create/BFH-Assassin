@@ -184,57 +184,29 @@ async function completeMission(event){
  }catch(e){msg(e.message,true)}
 }
 
-async function loadManagedGames(event){
- event?.preventDefault();
+async function deletePreviousGames(){
  const name=$("managerHostName").value.trim(),pin=$("managerHostPin").value.trim();
  if(!name||!validPin(pin))return msg("Enter the host name and 4-digit PIN.",true);
+ if(!confirm("Delete every previous game for this host? Your newest game will be kept. This cannot be undone."))return;
+ const button=$("deletePreviousGamesBtn");
+ button.disabled=true;
+ const oldText=button.textContent;
+ button.textContent="Deleting…";
  try{
-  const {data,error}=await sb.rpc("list_host_games",{p_host_name:name,p_pin:pin});
+  const {data,error}=await sb.rpc("delete_previous_host_games",{p_host_name:name,p_pin:pin});
   if(error)throw error;
-  renderManagedGames(data||[]);
-  $("managerResults").classList.remove("hidden");
- }catch(e){msg("Could not load games: "+e.message,true)}
+  const count=Number(data||0);
+  msg(count
+   ? `${count} previous game${count===1?"":"s"} deleted. Your newest game was kept.`
+   : "There were no previous games to delete.");
+ }catch(error){
+  msg("Could not delete previous games: "+error.message,true);
+ }finally{
+  button.disabled=false;
+  button.textContent=oldText;
+ }
 }
-function renderManagedGames(games){
- const list=$("managedGamesList");list.innerHTML="";
- $("managedGameCount").textContent=`${games.length} found`;
- $("deleteFinishedGamesBtn").disabled=!games.some(g=>g.status==="finished");
- if(!games.length){const li=document.createElement("li");li.className="managerEmpty";li.textContent="No games found for that host name and PIN.";list.append(li);return}
- games.forEach(g=>{
-  const li=document.createElement("li");li.className="managedGame";
-  const info=document.createElement("div");info.className="managedGameInfo";
-  const title=document.createElement("strong");title.textContent=g.code||"No code";
-  const meta=document.createElement("small");meta.textContent=`${statusLabel(g.status)} · ${g.player_count||0} players · ${new Date(g.created_at).toLocaleDateString()}`;
-  info.append(title,meta);
-  const actions=document.createElement("div");actions.className="managedGameActions";
-  if(g.status!=="finished"){const finish=document.createElement("button");finish.type="button";finish.className="miniButton";finish.textContent="Mark finished";finish.onclick=()=>finishManagedGame(g.id,g.code);actions.append(finish)}
-  const del=document.createElement("button");del.type="button";del.className="miniDanger";del.textContent="Delete";del.onclick=()=>deleteManagedGame(g.id,g.code);actions.append(del);
-  li.append(info,actions);list.append(li);
- });
-}
-function statusLabel(status){return status==="waiting"?"Waiting":status==="started"?"In progress":status==="finished"?"Finished":status||"Unknown"}
-async function finishManagedGame(gameId,code){
- if(!confirm(`Mark game ${code} as finished?`))return;
- const name=$("managerHostName").value.trim(),pin=$("managerHostPin").value.trim();
- const {error}=await sb.rpc("finish_host_game",{p_game_id:gameId,p_host_name:name,p_pin:pin});
- if(error)return msg("Could not finish game: "+error.message,true);
- msg(`Game ${code} marked finished.`);loadManagedGames();
-}
-async function deleteManagedGame(gameId,code){
- if(!confirm(`Permanently delete game ${code}? This removes all players, missions and history.`))return;
- const name=$("managerHostName").value.trim(),pin=$("managerHostPin").value.trim();
- const {error}=await sb.rpc("delete_host_game",{p_game_id:gameId,p_host_name:name,p_pin:pin});
- if(error)return msg("Could not delete game: "+error.message,true);
- if(session?.gameId===gameId)clear();
- msg(`Game ${code} deleted.`);loadManagedGames();
-}
-async function deleteFinishedGames(){
- if(!confirm("Delete every finished game belonging to this host? This cannot be undone."))return;
- const name=$("managerHostName").value.trim(),pin=$("managerHostPin").value.trim();
- const {data,error}=await sb.rpc("delete_finished_host_games",{p_host_name:name,p_pin:pin});
- if(error)return msg("Could not delete finished games: "+error.message,true);
- msg(`${data||0} finished game${data===1?"":"s"} deleted.`);loadManagedGames();
-}
+
 async function deleteCurrentGame(){
  if(!session?.isHost)return msg("Only the host can delete this game.",true);
  const pin=prompt("Enter your 4-digit host PIN to permanently delete this game:");
@@ -268,8 +240,7 @@ function init(){
  $("showJoinBtn").onclick=()=>showView("joinView");
  $("showLoginBtn").onclick=()=>showView("loginView");
  $("showManagerBtn").onclick=()=>showView("managerView");
- $("loadManagedGamesBtn").onclick=loadManagedGames;
- $("deleteFinishedGamesBtn").onclick=deleteFinishedGames;
+ $("deletePreviousGamesBtn").onclick=deletePreviousGames;
  $("deleteCurrentGameBtn").onclick=deleteCurrentGame;
  $("deleteCurrentGameInPlayBtn").onclick=deleteCurrentGame;
  document.querySelectorAll("[data-home]").forEach(button=>{

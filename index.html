@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#050505" />
   <title>BFH Assassin</title>
-  <link rel="stylesheet" href="styles.css?v=1.3.1" />
+  <link rel="stylesheet" href="styles.css?v=1.4" />
 </head>
 <body>
   <div class="appFrame">
@@ -39,7 +39,7 @@
           <button type="button" id="showCreateBtn" class="primary">Create game</button>
           <button type="button" id="showJoinBtn" class="secondary">Join game</button>
           <button type="button" id="showLoginBtn" class="secondary">Player login</button>
-          <button type="button" id="showManagerBtn" class="secondary">Manage old games</button>
+          <button type="button" id="showManagerBtn" class="secondary">Delete previous games</button>
         </div>
       </section>
 
@@ -78,24 +78,19 @@
         </div>
       </section>
 
-
       <section id="managerView" class="view authView hidden">
-        <div class="authBrand compact"><span class="targetMark">◎</span><h1>Game Manager</h1><p>Review and remove games created with your host name and PIN.</p></div>
+        <div class="authBrand compact"><span class="targetMark">◎</span><h1>Clear Old Games</h1><p>Keep your newest game and remove everything older.</p></div>
         <div class="card formCard managerCard">
           <button type="button" class="backLink" data-home>← Back</button>
-          <span class="eyebrow">HOST ADMINISTRATION</span><h2>Manage old games</h2>
+          <span class="eyebrow">HOST CLEANUP</span><h2>Delete all previous games</h2>
           <label for="managerHostName">Host name</label><input id="managerHostName" maxlength="40" placeholder="e.g. Dad" autocomplete="name" />
           <label for="managerHostPin">Host 4-digit PIN</label><input id="managerHostPin" maxlength="4" inputmode="numeric" placeholder="1234" />
-          <button type="button" id="loadManagedGamesBtn" class="primary">Show my games</button>
-          <div id="managerResults" class="managerResults hidden">
-            <div class="managerToolbar"><div><strong>Your games</strong><small id="managedGameCount">0 found</small></div><button type="button" id="deleteFinishedGamesBtn" class="dangerButton">Delete finished games</button></div>
-            <ul id="managedGamesList" class="managedGamesList"></ul>
-            <p class="managerNote">Only games created with this host name and PIN are shown. Deleting a game permanently removes its players, missions and event history.</p>
-          </div>
+          <button type="button" id="deletePreviousGamesBtn" class="dangerButton fullDanger">Delete all previous games</button>
+          <p class="managerNote"><strong>Your newest game is kept.</strong> Every older game created with this host name and PIN is permanently removed, including its players, missions and event history.</p>
         </div>
       </section>
 
-      <section id="lobbyView" class="view dashboard hidden">
+<section id="lobbyView" class="view dashboard hidden">
         <aside class="sidePanel">
           <span class="sideLabel">GAME CODE</span>
           <button id="copyCodeBtn" class="sideCode" type="button"><span id="lobbyCode">------</span><small>Tap to copy</small></button>
@@ -111,7 +106,7 @@
         <section class="contentPanel">
           <div class="contentHeading"><div><span class="eyebrow">WAITING ROOM</span><h2>Ludbrook Manor</h2><p>Share the game code and wait for all agents to join.</p></div><span id="roleBadge" class="badge">PLAYER</span></div>
           <div class="floorPlanPreview" data-floor-plan role="button" tabindex="0" aria-label="Open Ludbrook Manor floor plan">
-            <img src="floor-plan.jpeg?v=1.3.1" alt="Ground-floor plan of Ludbrook Manor and the Stables" />
+            <img src="floor-plan.jpeg?v=1.4" alt="Ground-floor plan of Ludbrook Manor and the Stables" />
             <div class="previewOverlay"><span>▱</span><strong>Tap to view floor plan</strong><small>Pinch to zoom when open</small></div>
           </div>
           <div class="lobbyActions">
@@ -154,19 +149,19 @@
           <section id="feedPanel" class="panel hidden"><div class="contentHeading"><div><span class="eyebrow">LIVE UPDATES</span><h2>Event feed</h2><p>The latest activity from the operation.</p></div></div><ul id="eventFeed" class="feedList"></ul></section>
         </section>
       </section>
-      <p class="version">BFH ASSASSIN v1.3.1</p>
+      <p class="version">BFH ASSASSIN v1.4</p>
     </main>
   </div>
 
   <div id="floorPlanModal" class="floorPlanModal hidden" role="dialog" aria-modal="true" aria-labelledby="floorPlanTitle">
     <div class="floorPlanWindow">
       <div class="floorPlanHeader"><div><span class="eyebrow">LOCATION GUIDE</span><h2 id="floorPlanTitle">Ludbrook Manor</h2><p>Floor plan and outdoor mission areas</p></div><button type="button" id="closeFloorPlanBtn" class="closeFloorPlan" aria-label="Close floor plan">✕</button></div>
-      <div class="floorPlanScroller"><img src="floor-plan.jpeg?v=1.3.1" alt="Ground-floor plan of Ludbrook Manor and the Stables" class="floorPlanImage" /></div>
+      <div class="floorPlanScroller"><img src="floor-plan.jpeg?v=1.4" alt="Ground-floor plan of Ludbrook Manor and the Stables" class="floorPlanImage" /></div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=1.3.1"></script>
+  <script src="app.js?v=1.4"></script>
 </body>
 </html>
