@@ -34,9 +34,12 @@ async function createGame(){
   const {data:g,error:ge}=await sb.from("games").insert({code,host_name:name,status:"waiting"}).select("id,code").single();if(ge)throw ge;
   const {data:p,error:pe}=await sb.from("players").insert({game_id:g.id,name,status:"alive",alive:true}).select("id,name").single();if(pe)throw pe;
   const {error:se}=await sb.rpc("set_player_pin",{p_player_id:p.id,p_pin:pin});if(se)throw se;
-  await sb.from("games").update({host_player_id:p.id}).eq("id",g.id);
-  await sb.from("game_events").insert({game_id:g.id,event_type:"join",message:`${name} created the game.`});
-  save({gameId:g.id,code:g.code,playerId:p.id,playerName:p.name,isHost:true});openLobby();
+  const {error:he}=await sb.from("games").update({host_player_id:p.id}).eq("id",g.id);
+  if(he)throw he;
+  const {error:ee}=await sb.from("game_events").insert({game_id:g.id,event_type:"join",message:`${name} created the game.`});
+  if(ee)throw ee;
+  save({gameId:g.id,code:g.code,playerId:p.id,playerName:p.name,isHost:true});
+  openLobby();
  }catch(e){msg("Could not create game: "+e.message,true)}
 }
 
@@ -48,8 +51,10 @@ async function joinGame(){
   const {data:d,error:de}=await sb.from("players").select("id").eq("game_id",g.id).ilike("name",name).limit(1);if(de)throw de;if(d.length)throw Error("That name is already in use");
   const {data:p,error:pe}=await sb.from("players").insert({game_id:g.id,name,status:"alive",alive:true}).select("id,name").single();if(pe)throw pe;
   const {error:se}=await sb.rpc("set_player_pin",{p_player_id:p.id,p_pin:pin});if(se)throw se;
-  await sb.from("game_events").insert({game_id:g.id,event_type:"join",message:`${name} joined the game.`});
-  save({gameId:g.id,code:g.code,playerId:p.id,playerName:p.name,isHost:false});openLobby();
+  const {error:ee}=await sb.from("game_events").insert({game_id:g.id,event_type:"join",message:`${name} joined the game.`});
+  if(ee)throw ee;
+  save({gameId:g.id,code:g.code,playerId:p.id,playerName:p.name,isHost:false});
+  openLobby();
  }catch(e){msg("Could not join: "+e.message,true)}
 }
 
@@ -66,7 +71,17 @@ async function login(){
 async function loadLobby(){
  if(!session)return;
  const {data:g,error:ge}=await sb.from("games").select("id,code,host_player_id,status").eq("id",session.gameId).maybeSingle();
- if(ge||!g)return logout();
+ if(ge){
+  clearInterval(timer);
+  showView("lobbyView");
+  msg("Could not load lobby: "+ge.message,true);
+  return;
+ }
+ if(!g){
+  clearInterval(timer);
+  msg("This game could not be found.",true);
+  return;
+ }
  if(g.status!=="waiting")return openGame();
  const {data:ps,error:pe}=await sb.from("players").select("id,name").eq("game_id",session.gameId).order("created_at");
  if(pe)return msg(pe.message,true);
