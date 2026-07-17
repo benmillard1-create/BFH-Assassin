@@ -12,7 +12,37 @@ const sb=configured
  : null;
 const $=id=>document.getElementById(id);
 const views=["homeView","createView","joinView","loginView","lobbyView","gameView"];
-const objects=["Wooden spoon","Tea towel","Cushion","Mug","Paperback book","TV remote","Coaster","Hairbrush","Water bottle","Oven glove","Tissue box","Pen","Pencil","Notebook","Plate","Bowl","Fork","Spoon","Hand towel","Umbrella","Tennis ball","Sunglasses","Keyring","Phone charger"];
+const objects=["Mug","Glass","Plate","Bowl","Spoon","Tea towel","Cushion","Blanket","TV remote","Book","Towel","Hairbrush","Pen","Notebook","Phone charger","Torch","Umbrella","Shopping bag","Tennis ball","Playing card","Dice","Wooden spoon","Oven glove","Water bottle"];
+const objectIcons={
+ "Mug":"☕",
+ "Glass":"🥛",
+ "Plate":"🍽️",
+ "Bowl":"🥣",
+ "Spoon":"🥄",
+ "Tea towel":"🧻",
+ "Cushion":"🛋️",
+ "Blanket":"🧶",
+ "TV remote":"📺",
+ "Book":"📚",
+ "Towel":"🧺",
+ "Hairbrush":"🪮",
+ "Pen":"🖊️",
+ "Notebook":"📓",
+ "Phone charger":"🔌",
+ "Torch":"🔦",
+ "Umbrella":"☂️",
+ "Shopping bag":"🛍️",
+ "Tennis ball":"🎾",
+ "Playing card":"🃏",
+ "Dice":"🎲",
+ "Wooden spoon":"🥄",
+ "Oven glove":"🧤",
+ "Water bottle":"🚰"
+};
+function objectDisplayName(name){
+ const icon=objectIcons[name]||"●";
+ return `${icon} ${name}`;
+}
 const rooms=["Butlers’ Kitchen","Main Kitchen","Breakfast Room","Main Hall","Drawing Room","Dining Room","Study","Snug","Inner Hall","Pantry","Wellness Complex","Swimming Pool","Stables Kitchen","Sitting Room","Portico","Driveway","Garden","Tennis Court","Bridge over Pond"];
 let session=JSON.parse(localStorage.getItem("bfh_session")||"null");
 let timer=null;
@@ -122,7 +152,7 @@ async function loadGame(){
  if($("sidePlayerName")) $("sidePlayerName").textContent=p?.name||session.playerName;
  if($("gameCodeDisplay")) $("gameCodeDisplay").textContent=session.code||"------";
  const hasMission=!!m;$("missionWaiting").classList.toggle("hidden",hasMission);$("missionDetails").classList.toggle("hidden",!hasMission);
- if(m){$("targetName").textContent=m.players?.name||"Unknown";$("objectName").textContent=m.object_name;$("roomName").textContent=m.room_name}
+ if(m){$("targetName").textContent=m.players?.name||"Unknown";$("objectName").textContent=objectDisplayName(m.object_name);$("roomName").textContent=m.room_name}
  const completed=!!m?.completed;const ghost=p?.status==="ghost";
  $("missionStatusBadge").textContent=completed?"COMPLETE":ghost?"GHOST":"ACTIVE";
  if($("sideStatus")) $("sideStatus").textContent=completed?"✓ Mission complete":ghost?"● Ghost":"● Active";
