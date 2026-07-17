@@ -39,6 +39,7 @@
           <button type="button" id="showCreateBtn" class="primary">Create game</button>
           <button type="button" id="showJoinBtn" class="secondary">Join game</button>
           <button type="button" id="showLoginBtn" class="secondary">Player login</button>
+          <button type="button" id="showManagerBtn" class="secondary">Manage old games</button>
         </div>
       </section>
 
@@ -77,6 +78,23 @@
         </div>
       </section>
 
+
+      <section id="managerView" class="view authView hidden">
+        <div class="authBrand compact"><span class="targetMark">◎</span><h1>Game Manager</h1><p>Review and remove games created with your host name and PIN.</p></div>
+        <div class="card formCard managerCard">
+          <button type="button" class="backLink" data-home>← Back</button>
+          <span class="eyebrow">HOST ADMINISTRATION</span><h2>Manage old games</h2>
+          <label for="managerHostName">Host name</label><input id="managerHostName" maxlength="40" placeholder="e.g. Dad" autocomplete="name" />
+          <label for="managerHostPin">Host 4-digit PIN</label><input id="managerHostPin" maxlength="4" inputmode="numeric" placeholder="1234" />
+          <button type="button" id="loadManagedGamesBtn" class="primary">Show my games</button>
+          <div id="managerResults" class="managerResults hidden">
+            <div class="managerToolbar"><div><strong>Your games</strong><small id="managedGameCount">0 found</small></div><button type="button" id="deleteFinishedGamesBtn" class="dangerButton">Delete finished games</button></div>
+            <ul id="managedGamesList" class="managedGamesList"></ul>
+            <p class="managerNote">Only games created with this host name and PIN are shown. Deleting a game permanently removes its players, missions and event history.</p>
+          </div>
+        </div>
+      </section>
+
       <section id="lobbyView" class="view dashboard hidden">
         <aside class="sidePanel">
           <span class="sideLabel">GAME CODE</span>
@@ -87,6 +105,7 @@
           <ul id="playerList" class="sidePlayerList"></ul>
           <button type="button" data-floor-plan class="goldOutline">▱ View Floor Plan</button>
           <button type="button" id="switchPlayerBtn" class="darkButton">Switch player</button>
+          <button type="button" id="deleteCurrentGameBtn" class="textDanger hidden">Delete this game</button>
           <button type="button" id="leaveGameBtn" class="textDanger">Log out</button>
         </aside>
         <section class="contentPanel">
@@ -111,6 +130,7 @@
           <span class="sideLabel spaced">STATUS</span><div id="sideStatus" class="roleDisplay">● Active</div>
           <button type="button" data-floor-plan class="goldOutline">▱ View Floor Plan</button>
           <button type="button" id="hideMissionBtn" class="darkButton">Hide / switch player</button>
+          <button type="button" id="deleteCurrentGameInPlayBtn" class="textDanger hidden">Delete this game</button>
         </aside>
         <section class="contentPanel">
           <nav class="tabs">
@@ -134,7 +154,7 @@
           <section id="feedPanel" class="panel hidden"><div class="contentHeading"><div><span class="eyebrow">LIVE UPDATES</span><h2>Event feed</h2><p>The latest activity from the operation.</p></div></div><ul id="eventFeed" class="feedList"></ul></section>
         </section>
       </section>
-      <p class="version">BFH ASSASSIN v1.2</p>
+      <p class="version">BFH ASSASSIN v1.3</p>
     </main>
   </div>
 

@@ -11,7 +11,7 @@ const sb=configured
  ? window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY)
  : null;
 const $=id=>document.getElementById(id);
-const views=["homeView","createView","joinView","loginView","lobbyView","gameView"];
+const views=["homeView","createView","joinView","loginView","managerView","lobbyView","gameView"];
 const objects=["Mug","Glass","Plate","Bowl","Spoon","Tea towel","Cushion","Blanket","TV remote","Book","Towel","Hairbrush","Pen","Notebook","Phone charger","Torch","Umbrella","Shopping bag","Tennis ball","Playing card","Dice","Wooden spoon","Oven glove","Water bottle"];
 const objectIcons={
  "Mug":"☕",
@@ -123,6 +123,7 @@ async function loadLobby(){
  session.isHost=g.host_player_id===session.playerId;save(session);
  $("lobbyCode").textContent=g.code;$("roleBadge").textContent=session.isHost?"HOST":"PLAYER";$("playerCount").textContent=ps.length;
  $("startGameBtn").classList.toggle("hidden",!session.isHost);$("waitingText").classList.toggle("hidden",session.isHost);
+ $("deleteCurrentGameBtn")?.classList.toggle("hidden",!session.isHost);
  const l=$("playerList");l.innerHTML="";ps.forEach(p=>{const li=document.createElement("li"),n=document.createElement("span"),s=document.createElement("small");n.className="name";n.textContent=p.name;s.textContent=p.id===g.host_player_id?"Host":p.id===session.playerId?"You":"Ready";li.append(n,s);l.append(li)});
 }
 
@@ -141,13 +142,16 @@ async function dealMissions(event){
 
 async function loadGame(){
  if(!session)return;
- const [{data:p,error:pe},{data:m,error:me},{data:board,error:be},{data:events,error:ee}]=await Promise.all([
+ const [{data:g,error:ge},{data:p,error:pe},{data:m,error:me},{data:board,error:be},{data:events,error:ee}]=await Promise.all([
+  sb.from("games").select("host_player_id,status").eq("id",session.gameId).maybeSingle(),
   sb.from("players").select("id,name,status,mission_completed").eq("id",session.playerId).maybeSingle(),
   sb.from("missions").select("id,object_name,room_name,completed,target_player_id,players!missions_target_player_id_fkey(name)").eq("player_id",session.playerId).maybeSingle(),
   sb.from("players").select("id,name,status,mission_completed").eq("game_id",session.gameId).order("name"),
   sb.from("game_events").select("id,message,created_at").eq("game_id",session.gameId).order("created_at",{ascending:false}).limit(40)
  ]);
- if(pe||be||ee)return msg((pe||be||ee).message,true);
+ if(ge||pe||be||ee)return msg((ge||pe||be||ee).message,true);
+ session.isHost=g?.host_player_id===session.playerId;save(session);
+ $("deleteCurrentGameInPlayBtn")?.classList.toggle("hidden",!session.isHost);
  $("missionPlayerName").textContent=p?.name||session.playerName;
  if($("sidePlayerName")) $("sidePlayerName").textContent=p?.name||session.playerName;
  if($("gameCodeDisplay")) $("gameCodeDisplay").textContent=session.code||"------";
@@ -180,6 +184,67 @@ async function completeMission(event){
  }catch(e){msg(e.message,true)}
 }
 
+async function loadManagedGames(event){
+ event?.preventDefault();
+ const name=$("managerHostName").value.trim(),pin=$("managerHostPin").value.trim();
+ if(!name||!validPin(pin))return msg("Enter the host name and 4-digit PIN.",true);
+ try{
+  const {data,error}=await sb.rpc("list_host_games",{p_host_name:name,p_pin:pin});
+  if(error)throw error;
+  renderManagedGames(data||[]);
+  $("managerResults").classList.remove("hidden");
+ }catch(e){msg("Could not load games: "+e.message,true)}
+}
+function renderManagedGames(games){
+ const list=$("managedGamesList");list.innerHTML="";
+ $("managedGameCount").textContent=`${games.length} found`;
+ $("deleteFinishedGamesBtn").disabled=!games.some(g=>g.status==="finished");
+ if(!games.length){const li=document.createElement("li");li.className="managerEmpty";li.textContent="No games found for that host name and PIN.";list.append(li);return}
+ games.forEach(g=>{
+  const li=document.createElement("li");li.className="managedGame";
+  const info=document.createElement("div");info.className="managedGameInfo";
+  const title=document.createElement("strong");title.textContent=g.code||"No code";
+  const meta=document.createElement("small");meta.textContent=`${statusLabel(g.status)} · ${g.player_count||0} players · ${new Date(g.created_at).toLocaleDateString()}`;
+  info.append(title,meta);
+  const actions=document.createElement("div");actions.className="managedGameActions";
+  if(g.status!=="finished"){const finish=document.createElement("button");finish.type="button";finish.className="miniButton";finish.textContent="Mark finished";finish.onclick=()=>finishManagedGame(g.id,g.code);actions.append(finish)}
+  const del=document.createElement("button");del.type="button";del.className="miniDanger";del.textContent="Delete";del.onclick=()=>deleteManagedGame(g.id,g.code);actions.append(del);
+  li.append(info,actions);list.append(li);
+ });
+}
+function statusLabel(status){return status==="waiting"?"Waiting":status==="started"?"In progress":status==="finished"?"Finished":status||"Unknown"}
+async function finishManagedGame(gameId,code){
+ if(!confirm(`Mark game ${code} as finished?`))return;
+ const name=$("managerHostName").value.trim(),pin=$("managerHostPin").value.trim();
+ const {error}=await sb.rpc("finish_host_game",{p_game_id:gameId,p_host_name:name,p_pin:pin});
+ if(error)return msg("Could not finish game: "+error.message,true);
+ msg(`Game ${code} marked finished.`);loadManagedGames();
+}
+async function deleteManagedGame(gameId,code){
+ if(!confirm(`Permanently delete game ${code}? This removes all players, missions and history.`))return;
+ const name=$("managerHostName").value.trim(),pin=$("managerHostPin").value.trim();
+ const {error}=await sb.rpc("delete_host_game",{p_game_id:gameId,p_host_name:name,p_pin:pin});
+ if(error)return msg("Could not delete game: "+error.message,true);
+ if(session?.gameId===gameId)clear();
+ msg(`Game ${code} deleted.`);loadManagedGames();
+}
+async function deleteFinishedGames(){
+ if(!confirm("Delete every finished game belonging to this host? This cannot be undone."))return;
+ const name=$("managerHostName").value.trim(),pin=$("managerHostPin").value.trim();
+ const {data,error}=await sb.rpc("delete_finished_host_games",{p_host_name:name,p_pin:pin});
+ if(error)return msg("Could not delete finished games: "+error.message,true);
+ msg(`${data||0} finished game${data===1?"":"s"} deleted.`);loadManagedGames();
+}
+async function deleteCurrentGame(){
+ if(!session?.isHost)return msg("Only the host can delete this game.",true);
+ const pin=prompt("Enter your 4-digit host PIN to permanently delete this game:");
+ if(pin===null)return;if(!validPin(pin))return msg("Enter a valid 4-digit PIN.",true);
+ if(!confirm(`Delete game ${session.code}? All players, missions and history will be removed.`))return;
+ const {error}=await sb.rpc("delete_host_game",{p_game_id:session.gameId,p_host_name:session.playerName,p_pin:pin});
+ if(error)return msg("Could not delete game: "+error.message,true);
+ clearInterval(timer);clear();showView("homeView");msg("Game deleted.");
+}
+
 function openLobby(){showView("lobbyView");clearInterval(timer);loadLobby();timer=setInterval(loadLobby,2500)}
 function openGame(){showView("gameView");clearInterval(timer);loadGame();timer=setInterval(loadGame,2500)}
 function logout(){
@@ -202,6 +267,11 @@ function init(){
  $("showCreateBtn").onclick=()=>showView("createView");
  $("showJoinBtn").onclick=()=>showView("joinView");
  $("showLoginBtn").onclick=()=>showView("loginView");
+ $("showManagerBtn").onclick=()=>showView("managerView");
+ $("loadManagedGamesBtn").onclick=loadManagedGames;
+ $("deleteFinishedGamesBtn").onclick=deleteFinishedGames;
+ $("deleteCurrentGameBtn").onclick=deleteCurrentGame;
+ $("deleteCurrentGameInPlayBtn").onclick=deleteCurrentGame;
  document.querySelectorAll("[data-home]").forEach(button=>{
   button.onclick=event=>{
    event.preventDefault();
@@ -209,7 +279,7 @@ function init(){
   };
  });
 
- ["hostPin","playerPin","loginPin"].forEach(id=>{
+ ["hostPin","playerPin","loginPin","managerHostPin"].forEach(id=>{
   $(id).oninput=event=>{
    event.target.value=event.target.value.replace(/\D/g,"").slice(0,4);
   };
