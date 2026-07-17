@@ -1,4 +1,4 @@
 window.BFH_CONFIG = {
   SUPABASE_URL: "https://emkkkmisfmaccvreajwq.supabase.co",
-  SUPABASE_ANON_KEY: "PASTE_YOUR_ANON_KEY_HERE"
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVta2trbWlzZm1hY2N2cmVhandxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyMDE3NzYsImV4cCI6MjA5OTc3Nzc3Nn0.CaQdTWQjBFlbNnKjravMMp9-Bu-mAo0X94CG6P2l0gE"
 };
