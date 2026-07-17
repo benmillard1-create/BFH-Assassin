@@ -120,16 +120,33 @@ async function completeMission(){
 function openLobby(){showView("lobbyView");clearInterval(timer);loadLobby();timer=setInterval(loadLobby,2500)}
 function openGame(){showView("gameView");clearInterval(timer);loadGame();timer=setInterval(loadGame,2500)}
 function logout(){clearInterval(timer);clear();showView("homeView")}
+function switchPlayer(){
+ const rememberedCode=session?.code||"";
+ clearInterval(timer);
+ clear();
+ $("loginCode").value=rememberedCode;
+ $("loginName").value="";
+ $("loginPin").value="";
+ showView("loginView");
+ setTimeout(()=>$("loginName").focus(),50);
+}
 function init(){
- if(!sb||cfg.SUPABASE_ANON_KEY.includes("PASTE_"))return msg("Paste your Supabase anon key into config.js.",true);
  $("showCreateBtn").onclick=()=>showView("createView");$("showJoinBtn").onclick=()=>showView("joinView");$("showLoginBtn").onclick=()=>showView("loginView");
  document.querySelectorAll("[data-home]").forEach(b=>b.onclick=()=>showView("homeView"));
  ["hostPin","playerPin","loginPin"].forEach(id=>$(id).oninput=e=>e.target.value=e.target.value.replace(/\D/g,"").slice(0,4));
  ["joinCode","loginCode"].forEach(id=>$(id).oninput=e=>e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,6));
  $("createGameBtn").onclick=createGame;$("joinGameBtn").onclick=joinGame;$("loginBtn").onclick=login;$("startGameBtn").onclick=dealMissions;
  $("copyCodeBtn").onclick=async()=>{try{await navigator.clipboard.writeText(session.code);msg("Code copied.")}catch{msg("Game code: "+session.code)}};
- $("switchPlayerBtn").onclick=logout;$("leaveGameBtn").onclick=logout;$("hideMissionBtn").onclick=logout;$("missionCompleteBtn").onclick=completeMission;
- document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");["missionPanel","boardPanel","feedPanel"].forEach(id=>$(id).classList.toggle("hidden",id!==t.dataset.tab))});
+ $("switchPlayerBtn").onclick=switchPlayer;$("leaveGameBtn").onclick=logout;$("hideMissionBtn").onclick=switchPlayer;$("missionCompleteBtn").onclick=completeMission;
+ if(!sb||cfg.SUPABASE_ANON_KEY.includes("PASTE_")){
+  msg("Paste your Supabase anon key into config.js.",true);
+  return;
+ }
+ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{if(!sb||cfg.SUPABASE_ANON_KEY.includes("PASTE_")){
+  msg("Paste your Supabase anon key into config.js.",true);
+  return;
+ }
+ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");["missionPanel","boardPanel","feedPanel"].forEach(id=>$(id).classList.toggle("hidden",id!==t.dataset.tab))});
  if(session?.gameId){sb.from("games").select("status").eq("id",session.gameId).maybeSingle().then(({data})=>data?.status==="waiting"?openLobby():openGame())}
 }
 addEventListener("DOMContentLoaded",init);
