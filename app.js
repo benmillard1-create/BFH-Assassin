@@ -18,15 +18,16 @@ let session=JSON.parse(localStorage.getItem("bfh_session")||"null");
 let timer=null;
 
 function showView(id){views.forEach(v=>$(v).classList.toggle("hidden",v!==id))}
-function msg(t,e=false){const b=$("message");b.textContent=t;b.classList.toggle("error",e);b.classList.remove("hidden");setTimeout(()=>b.classList.add("hidden"),5000)}
-function save(s){session=s;localStorage.setItem("bfh_session",JSON.stringify(s))}
+function msg(t,e=false,stay=false){const b=$("message");b.textContent=t;b.classList.toggle("error",e);b.classList.remove("hidden");if(!stay)setTimeout(()=>b.classList.add("hidden"),8000)}
+function save(s){session={...s,savedAt:new Date().toISOString()};localStorage.setItem("bfh_session",JSON.stringify(session))}
 function clear(){session=null;localStorage.removeItem("bfh_session")}
 function validPin(v){return /^[0-9]{4}$/.test(v)}
 function randCode(){const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";return Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join("")}
 function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
 async function uniqueCode(){for(let i=0;i<10;i++){const c=randCode();const {data,error}=await sb.from("games").select("id").eq("code",c).limit(1);if(error)throw error;if(!data.length)return c}throw Error("Could not create a unique code")}
 
-async function createGame(){
+async function createGame(event){
+ event?.preventDefault();
  const name=$("hostName").value.trim(),pin=$("hostPin").value.trim();
  if(!name||!validPin(pin))return msg("Enter your name and a 4-digit PIN.",true);
  try{
@@ -43,7 +44,8 @@ async function createGame(){
  }catch(e){msg("Could not create game: "+e.message,true)}
 }
 
-async function joinGame(){
+async function joinGame(event){
+ event?.preventDefault();
  const code=$("joinCode").value.trim().toUpperCase(),name=$("playerName").value.trim(),pin=$("playerPin").value.trim();
  if(code.length!==6||!name||!validPin(pin))return msg("Enter the code, your name, and a 4-digit PIN.",true);
  try{
@@ -58,7 +60,8 @@ async function joinGame(){
  }catch(e){msg("Could not join: "+e.message,true)}
 }
 
-async function login(){
+async function login(event){
+ event?.preventDefault();
  const code=$("loginCode").value.trim().toUpperCase(),name=$("loginName").value.trim(),pin=$("loginPin").value.trim();
  if(!code||!name||!validPin(pin))return msg("Enter your game code, name, and PIN.",true);
  const {data,error}=await sb.rpc("player_login",{p_game_code:code,p_name:name,p_pin:pin});
@@ -91,7 +94,8 @@ async function loadLobby(){
  const l=$("playerList");l.innerHTML="";ps.forEach(p=>{const li=document.createElement("li"),n=document.createElement("span"),s=document.createElement("small");n.className="name";n.textContent=p.name;s.textContent=p.id===g.host_player_id?"Host":p.id===session.playerId?"You":"Ready";li.append(n,s);l.append(li)});
 }
 
-async function dealMissions(){
+async function dealMissions(event){
+ event?.preventDefault();
  try{
   const {data:ps,error:pe}=await sb.from("players").select("id,name").eq("game_id",session.gameId);if(pe)throw pe;
   if(ps.length<3)throw Error("At least 3 players are needed");
@@ -123,7 +127,8 @@ async function loadGame(){
  const f=$("eventFeed");f.innerHTML="";(events||[]).forEach(x=>{const li=document.createElement("li");li.textContent=x.message;const t=document.createElement("time");t.textContent=new Date(x.created_at).toLocaleString();li.append(t);f.append(li)});
 }
 
-async function completeMission(){
+async function completeMission(event){
+ event?.preventDefault();
  if(!confirm("Confirm that you completed your mission?"))return;
  try{
   const {data:m,error:me}=await sb.from("missions").select("id,target_player_id,completed").eq("player_id",session.playerId).maybeSingle();if(me)throw me;if(!m||m.completed)throw Error("Mission is already complete");
@@ -213,17 +218,25 @@ function init(){
  }
 
  if(session?.gameId){
+  // Open the remembered screen immediately. Never erase a newly created
+  // session merely because the first network/schema check fails.
+  showView("lobbyView");
   sb.from("games")
    .select("status")
    .eq("id",session.gameId)
    .maybeSingle()
    .then(({data,error})=>{
     if(error){
-     clear();
-     showView("homeView");
+     showView("lobbyView");
+     msg("Session saved, but Supabase could not reload the game: "+error.message,true,true);
      return;
     }
-    data?.status==="waiting"?openLobby():openGame();
+    if(!data){
+     showView("lobbyView");
+     msg("Session saved, but this game record could not be found.",true,true);
+     return;
+    }
+    data.status==="waiting"?openLobby():openGame();
    });
  }
 }
