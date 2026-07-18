@@ -50,7 +50,7 @@ let briefingTimer=null;
 let briefingIndex=0;
 let briefingOnFinish=null;
 let briefingAuto=false;
-const briefingSlides=Array.from({length:22},(_,i)=>`briefing/slide-${String(i+1).padStart(2,"0")}.jpg`);
+const briefingSlides=Array.from({length:18},(_,i)=>`briefing/slide-${String(i+1).padStart(2,"0")}.jpg`);
 
 function showView(id){views.forEach(v=>$(v).classList.toggle("hidden",v!==id))}
 function msg(t,e=false,stay=false){const b=$("message");b.textContent=t;b.classList.toggle("error",e);b.classList.remove("hidden");if(!stay)setTimeout(()=>b.classList.add("hidden"),8000)}
@@ -85,9 +85,7 @@ function renderBriefingSlide(){
  image.alt=`Mission briefing slide ${briefingIndex+1} of ${briefingSlides.length}`;
  $("briefingCounter").textContent=`${briefingIndex+1} / ${briefingSlides.length}`;
  $("briefingProgressBar").style.width=`${((briefingIndex+1)/briefingSlides.length)*100}%`;
- image.classList.remove("fadeOut","kenBurns");
- void image.offsetWidth;
- image.classList.add("kenBurns");
+ image.classList.remove("fadeOut");
 }
 function scheduleBriefingSlide(){
  clearTimeout(briefingTimer);

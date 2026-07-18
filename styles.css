@@ -42,3 +42,12 @@
 .briefingCountdown>small{font-size:clamp(.72rem,2.5vw,1rem);font-weight:900;letter-spacing:.2em}
 .briefingCountdown .goldOutline{width:auto;min-width:190px;margin-top:8px}
 @media(prefers-reduced-motion:reduce){.briefingStage img.kenBurns{animation:none}}
+
+/* v2.2.1 clean slideshow fix */
+.briefingCounter{display:none!important}
+.briefingStage img,
+.briefingStage img.kenBurns{
+  animation:none!important;
+  transform:none!important;
+  transition:opacity .35s ease!important;
+}
