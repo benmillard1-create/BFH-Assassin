@@ -105,7 +105,10 @@
         </aside>
         <section class="contentPanel">
           <div class="contentHeading"><div><span class="eyebrow">WAITING ROOM</span><h2>Ludbrook Manor</h2><p>Share the game code and wait for all agents to join.</p></div><span id="roleBadge" class="badge">PLAYER</span></div>
-          <button type="button" id="openRulesBtn" class="rulesButton"><span>§</span><strong>Read the game rules</strong><small>How missions, eliminations and Ghosts work</small></button>
+          <div class="waitingRoomBriefingActions">
+            <button type="button" id="openRulesBtn" class="rulesButton"><span>§</span><strong>Read the game rules</strong><small>How missions, eliminations and Ghosts work</small></button>
+            <button type="button" id="openBriefingBtn" class="rulesButton briefingButton"><span>▶</span><strong>Watch Mission Briefing</strong><small>Cinematic introduction with original theme music</small></button>
+          </div>
           <div class="floorPlanPreview" data-floor-plan role="button" tabindex="0" aria-label="Open Ludbrook Manor floor plan">
             <img src="floor-plan.jpeg?v=1.6" alt="Ground-floor plan of Ludbrook Manor and the Stables" />
             <div class="previewOverlay"><span>▱</span><strong>Tap to view floor plan</strong><small>Pinch to zoom when open</small></div>
@@ -150,7 +153,7 @@
           <section id="feedPanel" class="panel hidden"><div class="contentHeading"><div><span class="eyebrow">LIVE UPDATES</span><h2>Event feed</h2><p>The latest activity from the operation.</p></div></div><ul id="eventFeed" class="feedList"></ul></section>
         </section>
       </section>
-      <p class="version">BFH ASSASSIN v2.0</p>
+      <p class="version">BFH ASSASSIN v2.1</p>
     </main>
   </div>
 
@@ -177,6 +180,27 @@
     </div>
   </div>
 
+  <div id="briefingModal" class="briefingModal hidden" role="dialog" aria-modal="true" aria-labelledby="briefingTitle">
+    <div class="briefingWindow">
+      <div class="briefingTopbar">
+        <div><span class="eyebrow">CLASSIFIED PRESENTATION</span><h2 id="briefingTitle">Mission Briefing</h2></div>
+        <button type="button" id="closeBriefingBtn" class="briefingClose" aria-label="Close mission briefing">✕</button>
+      </div>
+      <div class="briefingStage">
+        <img id="briefingImage" src="briefing/slide-01.jpg" alt="BFH Assassin mission briefing slide" />
+        <div class="briefingShade"></div>
+        <div id="briefingCountdown" class="briefingCountdown hidden" aria-live="polite"><span id="briefingCountdownNumber">3</span><small>MISSION BRIEFING COMMENCING…</small><button type="button" id="briefingTapBtn" class="goldOutline hidden">Tap to begin</button></div>
+        <div id="briefingCounter" class="briefingCounter">1 / 22</div>
+      </div>
+      <audio id="briefingAudio" preload="auto" src="assets/audio/ludbrook-manor-assassins.mp3"></audio>
+      <div class="briefingControls">
+        <button type="button" id="briefingReplayBtn" class="goldOutline">↻ Replay</button>
+        <div class="briefingProgress" aria-hidden="true"><span id="briefingProgressBar"></span></div>
+        <button type="button" id="briefingSkipBtn" class="darkButton">Skip briefing</button>
+      </div>
+    </div>
+  </div>
+
   <div id="floorPlanModal" class="floorPlanModal hidden" role="dialog" aria-modal="true" aria-labelledby="floorPlanTitle">
     <div class="floorPlanWindow">
       <div class="floorPlanHeader"><div><span class="eyebrow">LOCATION GUIDE</span><h2 id="floorPlanTitle">Ludbrook Manor</h2><p>Floor plan and outdoor mission areas</p></div><button type="button" id="closeFloorPlanBtn" class="closeFloorPlan" aria-label="Close floor plan">✕</button></div>
@@ -186,6 +210,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=2.0"></script>
+  <script src="app.js?v=2.2"></script>
 </body>
 </html>

@@ -46,6 +46,11 @@ function objectDisplayName(name){
 const rooms=["Butlers’ Kitchen","Main Kitchen","Breakfast Room","Main Hall","Drawing Room","Dining Room","Study","Snug","Inner Hall","Pantry","Wellness Complex","Hot Tub","Stables Kitchen","Sitting Room","Portico","Driveway","Garden","Tennis Court","Bridge over Pond"];
 let session=JSON.parse(localStorage.getItem("bfh_session")||"null");
 let timer=null;
+let briefingTimer=null;
+let briefingIndex=0;
+let briefingOnFinish=null;
+let briefingAuto=false;
+const briefingSlides=Array.from({length:22},(_,i)=>`briefing/slide-${String(i+1).padStart(2,"0")}.jpg`);
 
 function showView(id){views.forEach(v=>$(v).classList.toggle("hidden",v!==id))}
 function msg(t,e=false,stay=false){const b=$("message");b.textContent=t;b.classList.toggle("error",e);b.classList.remove("hidden");if(!stay)setTimeout(()=>b.classList.add("hidden"),8000)}
@@ -54,7 +59,110 @@ function clear(){session=null;localStorage.removeItem("bfh_session")}
 function openFloorPlan(){const modal=$("floorPlanModal");modal.classList.remove("hidden");document.body.classList.add("modalOpen");$("closeFloorPlanBtn").focus()}
 function closeFloorPlan(){$("floorPlanModal").classList.add("hidden");if($("rulesModal").classList.contains("hidden"))document.body.classList.remove("modalOpen")}
 function openRules(){$("rulesModal").classList.remove("hidden");document.body.classList.add("modalOpen");$("closeRulesBtn").focus()}
-function closeRules(){$("rulesModal").classList.add("hidden");if($("floorPlanModal").classList.contains("hidden"))document.body.classList.remove("modalOpen")}
+function closeRules(){$("rulesModal").classList.add("hidden");if($("floorPlanModal").classList.contains("hidden")&&$("briefingModal").classList.contains("hidden"))document.body.classList.remove("modalOpen")}
+function briefingSeenKey(){return session?.gameId&&session?.playerId?`bfh_briefing_seen_${session.gameId}_${session.playerId}`:""}
+function hasSeenBriefing(){const key=briefingSeenKey();return key&&localStorage.getItem(key)==="yes"}
+function markBriefingSeen(){const key=briefingSeenKey();if(key)localStorage.setItem(key,"yes")}
+function briefingAudio(){return $("briefingAudio")}
+function stopBriefingAudio(fade=true){
+ const audio=briefingAudio();
+ if(!audio)return;
+ if(!fade){audio.pause();audio.currentTime=0;audio.volume=1;return}
+ const startVolume=audio.volume||1;
+ const started=performance.now();
+ const fadeMs=850;
+ function step(now){
+  const progress=Math.min(1,(now-started)/fadeMs);
+  audio.volume=Math.max(0,startVolume*(1-progress));
+  if(progress<1&&!audio.paused)requestAnimationFrame(step);
+  else{audio.pause();audio.currentTime=0;audio.volume=1}
+ }
+ requestAnimationFrame(step);
+}
+function renderBriefingSlide(){
+ const image=$("briefingImage");
+ image.src=briefingSlides[briefingIndex];
+ image.alt=`Mission briefing slide ${briefingIndex+1} of ${briefingSlides.length}`;
+ $("briefingCounter").textContent=`${briefingIndex+1} / ${briefingSlides.length}`;
+ $("briefingProgressBar").style.width=`${((briefingIndex+1)/briefingSlides.length)*100}%`;
+ image.classList.remove("fadeOut","kenBurns");
+ void image.offsetWidth;
+ image.classList.add("kenBurns");
+}
+function scheduleBriefingSlide(){
+ clearTimeout(briefingTimer);
+ const audio=briefingAudio();
+ const totalMs=(Number.isFinite(audio?.duration)&&audio.duration>1?audio.duration:43.8)*1000;
+ const slideMs=totalMs/briefingSlides.length;
+ const fadeMs=Math.min(450,slideMs*.24);
+ briefingTimer=setTimeout(()=>{
+  $("briefingImage").classList.add("fadeOut");
+  briefingTimer=setTimeout(()=>{
+   if(briefingIndex>=briefingSlides.length-1)return finishBriefing(false);
+   briefingIndex+=1;renderBriefingSlide();scheduleBriefingSlide();
+  },fadeMs);
+ },Math.max(250,slideMs-fadeMs));
+}
+function hideBriefingCountdown(){
+ $("briefingCountdown").classList.add("hidden");
+ $("briefingTapBtn").classList.add("hidden");
+}
+function startBriefingPresentation(){
+ hideBriefingCountdown();
+ briefingIndex=0;
+ renderBriefingSlide();
+ scheduleBriefingSlide();
+}
+async function beginBriefingCountdown(){
+ clearTimeout(briefingTimer);
+ const overlay=$("briefingCountdown");
+ const number=$("briefingCountdownNumber");
+ const tap=$("briefingTapBtn");
+ overlay.classList.remove("hidden");tap.classList.add("hidden");
+ const audio=briefingAudio();
+ audio.pause();audio.currentTime=0;audio.volume=1;
+ try{await audio.play();audio.pause();audio.currentTime=0}
+ catch(_){
+  number.textContent="";tap.classList.remove("hidden");tap.focus();return;
+ }
+ let count=3;number.textContent=String(count);
+ const tick=()=>{
+  if(count<=1){
+   audio.play().then(startBriefingPresentation).catch(()=>{
+    number.textContent="";tap.classList.remove("hidden");tap.focus();
+   });
+   return;
+  }
+  count-=1;number.textContent=String(count);briefingTimer=setTimeout(tick,1000);
+ };
+ briefingTimer=setTimeout(tick,1000);
+}
+async function tapToBeginBriefing(){
+ const audio=briefingAudio();
+ try{audio.currentTime=0;audio.volume=1;await audio.play();startBriefingPresentation()}
+ catch(_){msg("Tap again to allow the mission briefing music.",true)}
+}
+function playBriefing(onFinish=null,isAuto=false){
+ clearInterval(timer);clearTimeout(briefingTimer);stopBriefingAudio(false);
+ briefingOnFinish=onFinish;briefingAuto=isAuto;briefingIndex=0;
+ $("briefingModal").classList.remove("hidden");document.body.classList.add("modalOpen");
+ $("closeBriefingBtn").classList.toggle("hidden",isAuto);
+ $("briefingSkipBtn").textContent=isAuto?"Skip to mission":"Close briefing";
+ renderBriefingSlide();beginBriefingCountdown();
+}
+function finishBriefing(fadeAudio=true){
+ clearTimeout(briefingTimer);hideBriefingCountdown();stopBriefingAudio(fadeAudio);$("briefingModal").classList.add("hidden");
+ if($("rulesModal").classList.contains("hidden")&&$("floorPlanModal").classList.contains("hidden"))document.body.classList.remove("modalOpen");
+ const callback=briefingOnFinish;const wasAuto=briefingAuto;briefingOnFinish=null;briefingAuto=false;
+ if(wasAuto)markBriefingSeen();
+ if(callback)setTimeout(callback,fadeAudio?900:0);
+}
+function replayBriefing(){stopBriefingAudio(false);beginBriefingCountdown()}
+function openGameAfterBriefing(){
+ clearInterval(timer);
+ if(hasSeenBriefing())return openGame();
+ playBriefing(openGame,true);
+}
 function validPin(v){return /^[0-9]{4}$/.test(v)}
 function randCode(){const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";return Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join("")}
 function shuffle(a){
@@ -117,7 +225,7 @@ async function login(event){
  if(error)return msg("Login failed: "+error.message,true);
  if(!data?.length)return msg("Name, code, or PIN was incorrect.",true);
  const r=data[0];save({gameId:r.game_id,code:r.game_code,playerId:r.player_id,playerName:r.player_name,isHost:r.is_host});
- r.game_status==="waiting"?openLobby():openGame();
+ r.game_status==="waiting"?openLobby():openGameAfterBriefing();
 }
 
 async function loadLobby(){
@@ -134,7 +242,7 @@ async function loadLobby(){
   msg("This game could not be found.",true);
   return;
  }
- if(g.status!=="waiting")return openGame();
+ if(g.status!=="waiting")return openGameAfterBriefing();
  const {data:ps,error:pe}=await sb.from("players").select("id,name").eq("game_id",session.gameId).order("created_at");
  if(pe)return msg(pe.message,true);
  session.isHost=g.host_player_id===session.playerId;save(session);
@@ -163,7 +271,7 @@ async function dealMissions(event){
   const {error:me}=await sb.from("missions").insert(rows);if(me)throw me;
   const {error:ge}=await sb.from("games").update({status:"started",started_at:new Date().toISOString()}).eq("id",session.gameId);if(ge)throw ge;
   await sb.from("game_events").insert({game_id:session.gameId,event_type:"start",message:"The game has started. Secret missions have been assigned."});
-  openGame();
+  openGameAfterBriefing();
  }catch(e){msg("Could not start game: "+e.message,true)}
 }
 
@@ -318,13 +426,20 @@ function init(){
  document.querySelectorAll("[data-floor-plan]").forEach(button=>{button.onclick=openFloorPlan;button.onkeydown=event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openFloorPlan()}}});
  document.querySelectorAll("[data-open-tab]").forEach(button=>button.onclick=()=>{if(!session?.gameId)return;openGame();setTimeout(()=>document.querySelector(`.tab[data-tab="${button.dataset.openTab}"]`)?.click(),0)});
  $("openRulesBtn").onclick=openRules;
+ $("openBriefingBtn").onclick=()=>playBriefing(null,false);
+ $("briefingReplayBtn").onclick=replayBriefing;
+ $("briefingTapBtn").onclick=tapToBeginBriefing;
+ $("briefingSkipBtn").onclick=finishBriefing;
+ $("closeBriefingBtn").onclick=finishBriefing;
+ $("briefingModal").onclick=event=>{if(event.target.id==="briefingModal"&&!briefingAuto)finishBriefing()};
  $("closeRulesBtn").onclick=closeRules;
  $("rulesModal").onclick=event=>{if(event.target.id==="rulesModal")closeRules()};
  $("closeFloorPlanBtn").onclick=closeFloorPlan;
  $("floorPlanModal").onclick=event=>{if(event.target.id==="floorPlanModal")closeFloorPlan()};
  document.addEventListener("keydown",event=>{
   if(event.key!=="Escape")return;
-  if(!$("rulesModal").classList.contains("hidden"))closeRules();
+  if(!$("briefingModal").classList.contains("hidden")&&!briefingAuto)finishBriefing();
+  else if(!$("rulesModal").classList.contains("hidden"))closeRules();
   else if(!$("floorPlanModal").classList.contains("hidden"))closeFloorPlan();
  });
 
@@ -362,7 +477,7 @@ function init(){
      msg("Session saved, but this game record could not be found.",true,true);
      return;
     }
-    data.status==="waiting"?openLobby():openGame();
+    data.status==="waiting"?openLobby():openGameAfterBriefing();
    });
  }
 }
