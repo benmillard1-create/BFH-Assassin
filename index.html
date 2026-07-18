@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#050505" />
   <title>BFH Assassin</title>
-  <link rel="stylesheet" href="styles.css?v=1.7" />
+  <link rel="stylesheet" href="styles.css?v=2.0" />
 </head>
 <body>
   <div class="appFrame">
@@ -105,6 +105,7 @@
         </aside>
         <section class="contentPanel">
           <div class="contentHeading"><div><span class="eyebrow">WAITING ROOM</span><h2>Ludbrook Manor</h2><p>Share the game code and wait for all agents to join.</p></div><span id="roleBadge" class="badge">PLAYER</span></div>
+          <button type="button" id="openRulesBtn" class="rulesButton"><span>§</span><strong>Read the game rules</strong><small>How missions, eliminations and Ghosts work</small></button>
           <div class="floorPlanPreview" data-floor-plan role="button" tabindex="0" aria-label="Open Ludbrook Manor floor plan">
             <img src="floor-plan.jpeg?v=1.6" alt="Ground-floor plan of Ludbrook Manor and the Stables" />
             <div class="previewOverlay"><span>▱</span><strong>Tap to view floor plan</strong><small>Pinch to zoom when open</small></div>
@@ -149,8 +150,31 @@
           <section id="feedPanel" class="panel hidden"><div class="contentHeading"><div><span class="eyebrow">LIVE UPDATES</span><h2>Event feed</h2><p>The latest activity from the operation.</p></div></div><ul id="eventFeed" class="feedList"></ul></section>
         </section>
       </section>
-      <p class="version">BFH ASSASSIN v1.9</p>
+      <p class="version">BFH ASSASSIN v2.0</p>
     </main>
+  </div>
+
+
+  <div id="rulesModal" class="rulesModal hidden" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+    <div class="rulesWindow">
+      <div class="rulesHeader">
+        <div><span class="eyebrow">OPERATION BRIEFING</span><h2 id="rulesTitle">Game rules</h2><p>Read these before the host deals the missions.</p></div>
+        <button type="button" id="closeRulesBtn" class="closeFloorPlan" aria-label="Close rules">✕</button>
+      </div>
+      <div class="rulesContent">
+        <section class="ruleIntro"><strong>Your mission is secret.</strong><p>Each player receives one target, one object and one location. Do not show your mission to anyone.</p></section>
+        <ol class="rulesList">
+          <li><strong>Complete the assignment.</strong><span>Get your target to voluntarily touch or hold your assigned object while they are in your assigned location.</span></li>
+          <li><strong>Keep it safe.</strong><span>Never throw an object at someone, force physical contact, damage property or create a dangerous situation.</span></li>
+          <li><strong>Record it honestly.</strong><span>Once the conditions are met, privately open your mission and tap <em>Mission complete</em>. Only record a genuine elimination.</span></li>
+          <li><strong>Eliminated players become Ghosts.</strong><span>A Ghost stays in the game and may still complete their own original mission.</span></li>
+          <li><strong>One mission per player.</strong><span>Completing a mission does not give you a new target. Mission Complete and Ghost are separate statuses, so a player may be both.</span></li>
+          <li><strong>Respect private areas.</strong><span>Bedrooms are not mission locations. Respect closed doors, personal belongings and anyone who does not want to take part.</span></li>
+          <li><strong>Host decides disputes.</strong><span>If an elimination is unclear, pause and ask the host. The host’s decision is final.</span></li>
+        </ol>
+        <div class="rulesNote"><strong>Assignment variety</strong><span>Every room and object is used once before any repeats. If there are more players than available rooms or objects, a new shuffled cycle begins.</span></div>
+      </div>
+    </div>
   </div>
 
   <div id="floorPlanModal" class="floorPlanModal hidden" role="dialog" aria-modal="true" aria-labelledby="floorPlanTitle">
@@ -162,6 +186,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=1.7"></script>
+  <script src="app.js?v=2.0"></script>
 </body>
 </html>

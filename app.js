@@ -52,7 +52,9 @@ function msg(t,e=false,stay=false){const b=$("message");b.textContent=t;b.classL
 function save(s){session={...s,savedAt:new Date().toISOString()};localStorage.setItem("bfh_session",JSON.stringify(session))}
 function clear(){session=null;localStorage.removeItem("bfh_session")}
 function openFloorPlan(){const modal=$("floorPlanModal");modal.classList.remove("hidden");document.body.classList.add("modalOpen");$("closeFloorPlanBtn").focus()}
-function closeFloorPlan(){$("floorPlanModal").classList.add("hidden");document.body.classList.remove("modalOpen")}
+function closeFloorPlan(){$("floorPlanModal").classList.add("hidden");if($("rulesModal").classList.contains("hidden"))document.body.classList.remove("modalOpen")}
+function openRules(){$("rulesModal").classList.remove("hidden");document.body.classList.add("modalOpen");$("closeRulesBtn").focus()}
+function closeRules(){$("rulesModal").classList.add("hidden");if($("floorPlanModal").classList.contains("hidden"))document.body.classList.remove("modalOpen")}
 function validPin(v){return /^[0-9]{4}$/.test(v)}
 function randCode(){const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";return Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join("")}
 function shuffle(a){
@@ -315,9 +317,16 @@ function init(){
  $("missionCompleteBtn").onclick=completeMission;
  document.querySelectorAll("[data-floor-plan]").forEach(button=>{button.onclick=openFloorPlan;button.onkeydown=event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openFloorPlan()}}});
  document.querySelectorAll("[data-open-tab]").forEach(button=>button.onclick=()=>{if(!session?.gameId)return;openGame();setTimeout(()=>document.querySelector(`.tab[data-tab="${button.dataset.openTab}"]`)?.click(),0)});
+ $("openRulesBtn").onclick=openRules;
+ $("closeRulesBtn").onclick=closeRules;
+ $("rulesModal").onclick=event=>{if(event.target.id==="rulesModal")closeRules()};
  $("closeFloorPlanBtn").onclick=closeFloorPlan;
  $("floorPlanModal").onclick=event=>{if(event.target.id==="floorPlanModal")closeFloorPlan()};
- document.addEventListener("keydown",event=>{if(event.key==="Escape"&&!$("floorPlanModal").classList.contains("hidden"))closeFloorPlan()});
+ document.addEventListener("keydown",event=>{
+  if(event.key!=="Escape")return;
+  if(!$("rulesModal").classList.contains("hidden"))closeRules();
+  else if(!$("floorPlanModal").classList.contains("hidden"))closeFloorPlan();
+ });
 
  document.querySelectorAll(".tab").forEach(tab=>{
   tab.onclick=()=>{
