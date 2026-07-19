@@ -142,3 +142,116 @@
     justify-content:flex-start!important;
   }
 }
+
+/* v2.3.3 definitive status-board and classified-reveal cleanup */
+#statusBoard.boardList{
+  display:grid;
+  gap:10px;
+  padding:0;
+  margin:0;
+  list-style:none;
+}
+#statusBoard .boardPlayerRow{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:16px!important;
+  min-width:0!important;
+  padding:15px 16px!important;
+  border:1px solid var(--line-light)!important;
+  border-radius:12px!important;
+  background:#fff!important;
+}
+#statusBoard .boardPlayerRow::before{content:none!important;display:none!important}
+#statusBoard .boardPlayerName{
+  display:block;
+  flex:1 1 auto;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:var(--ink);
+  font-size:1rem;
+  line-height:1.3;
+}
+#statusBoard .boardStatuses{
+  display:flex!important;
+  flex:0 0 auto!important;
+  flex-wrap:wrap!important;
+  justify-content:flex-end!important;
+  gap:7px!important;
+  max-width:60%;
+  margin:0!important;
+}
+#statusBoard .boardStatus{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:5px 9px;
+  border:1px solid #d7d1c7;
+  border-radius:999px;
+  background:#f6f3ed;
+  color:#4f4a42;
+  font-size:.76rem;
+  font-weight:800;
+  line-height:1.1;
+  white-space:nowrap;
+}
+#statusBoard .boardStatusAlive{border-color:#add7b9;background:#edf8f0;color:#246738}
+#statusBoard .boardStatusGhost{border-color:#d9b8b8;background:#fbefef;color:#8a3535}
+#statusBoard .boardStatusComplete{border-color:#dcc68d;background:#fbf5e3;color:#7a5a12}
+#statusBoard .boardStatusPending{border-color:#d8d4cc;background:#f5f3ef;color:#68635c}
+@media(max-width:620px){
+  #statusBoard .boardPlayerRow{display:block!important}
+  #statusBoard .boardPlayerName{margin-bottom:10px;white-space:normal;overflow:visible}
+  #statusBoard .boardStatuses{justify-content:flex-start!important;max-width:none;width:100%}
+}
+
+/* The reveal is a completely opaque screen. No mission content can show through. */
+#missionRevealModal.missionRevealModal{
+  position:fixed!important;
+  inset:0!important;
+  z-index:2147483000!important;
+  display:grid!important;
+  place-items:center!important;
+  overflow:auto!important;
+  padding:20px!important;
+  background:#050505!important;
+  opacity:1!important;
+  isolation:isolate!important;
+}
+#missionRevealModal.hidden{display:none!important}
+#missionRevealModal .missionRevealStage{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:12px!important;
+  width:min(94vw,680px)!important;
+  min-height:min(88vh,680px)!important;
+}
+#missionRevealModal .classifiedFolder{
+  position:absolute!important;
+  inset:auto!important;
+  top:50%!important;
+  left:50%!important;
+  width:min(90vw,570px)!important;
+  transform:translate(-50%,-42%) scale(.92)!important;
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+#missionRevealModal.opened .classifiedFolder{
+  transform:translate(-50%,-50%) scale(1)!important;
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+#missionRevealModal.opened .missionEnvelope,
+#missionRevealModal.opened .revealPrivacy{
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+#missionRevealModal .missionEnvelope{flex:0 0 auto!important;cursor:pointer!important}

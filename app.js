@@ -338,15 +338,19 @@ async function loadGame(){
  $("missionHint").textContent=completed?"Your mission is complete.":ghost?"You are a ghost, but your mission is still active.":"Keep this screen private.";
  $("missionCompleteBtn").classList.toggle("hidden",!m||completed);
  latestBoard=board||[];const b=$("statusBoard");b.innerHTML="";(board||[]).forEach(x=>{
-  const li=document.createElement("li"),n=document.createElement("span"),statuses=document.createElement("span");
-  const life=document.createElement("small"),mission=document.createElement("small");
-  n.className="name";n.textContent=x.name;
-  statuses.className="statusIndicators";
-  life.className=x.status==="ghost"?"statusPill eliminated":"statusPill alive";
-  life.textContent=x.status==="ghost"?"👻 Ghost":"🟢 Alive";
-  mission.className=x.mission_completed?"statusPill complete":"statusPill pending";
-  mission.textContent=x.mission_completed?"🎯 Mission complete":"○ Mission pending";
-  statuses.append(life,mission);li.append(n,statuses);b.append(li)
+  const li=document.createElement("li");
+  const name=document.createElement("strong");
+  const statuses=document.createElement("div");
+  const life=document.createElement("span");
+  const mission=document.createElement("span");
+  li.className="boardPlayerRow";
+  name.className="boardPlayerName";name.textContent=x.name;
+  statuses.className="boardStatuses";
+  life.className=x.status==="ghost"?"boardStatus boardStatusGhost":"boardStatus boardStatusAlive";
+  life.textContent=x.status==="ghost"?"Ghost":"Alive";
+  mission.className=x.mission_completed?"boardStatus boardStatusComplete":"boardStatus boardStatusPending";
+  mission.textContent=x.mission_completed?"Mission complete":"Mission pending";
+  statuses.append(life,mission);li.append(name,statuses);b.append(li);
  });
  const f=$("eventFeed");f.innerHTML="";(events||[]).forEach(x=>{const li=document.createElement("li");li.textContent=x.message;const t=document.createElement("time");t.textContent=new Date(x.created_at).toLocaleString();li.append(t);f.append(li)});
  const allComplete=(board||[]).length>=3&&(board||[]).every(x=>x.mission_completed);
