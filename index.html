@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#050505" />
   <title>BFH Assassin</title>
-  <link rel="stylesheet" href="styles.css?v=2.0" />
+  <link rel="stylesheet" href="styles.css?v=2.3.7" />
 </head>
 <body>
   <div class="appFrame">
@@ -146,14 +146,14 @@
               <div class="missionBlock"><small>OBJECT</small><strong id="objectName">—</strong><span>Use this everyday object</span></div>
               <div class="missionBlock"><small>LOCATION</small><strong id="roomName">—</strong><span>Complete the mission here</span></div>
             </div>
-            <div class="missionFooter"><p id="missionHint" class="waiting">Keep this screen private.</p><button type="button" id="missionCompleteBtn" class="primary hidden">Mission complete</button></div>
+            <div class="missionFooter"><p id="missionHint" class="waiting">Keep this screen private.</p><div class="missionFooterActions"><button type="button" id="replayMissionRevealBtn" class="secondary">View mission reveal</button><button type="button" id="missionCompleteBtn" class="primary hidden">Mission complete</button></div></div>
           </section>
 
           <section id="boardPanel" class="panel hidden"><div class="contentHeading"><div><span class="eyebrow">PUBLIC INTELLIGENCE</span><h2>Status board</h2><p>Elimination and mission progress are shown separately.</p></div></div><ul id="statusBoard" class="boardList"></ul></section>
           <section id="feedPanel" class="panel hidden"><div class="contentHeading"><div><span class="eyebrow">LIVE UPDATES</span><h2>Event feed</h2><p>The latest activity from the operation.</p></div></div><ul id="eventFeed" class="feedList"></ul></section>
         </section>
       </section>
-      <p class="version">BFH ASSASSIN v2.3.4</p>
+      <p class="version">BFH ASSASSIN v2.3.7</p>
     </main>
   </div>
 
@@ -268,6 +268,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=2.3"></script>
+  <script src="app.js?v=2.3.7"></script>
 </body>
 </html>

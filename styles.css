@@ -444,3 +444,28 @@
 #missionRevealModal .revealStepDots span.active{background:#d7b56d!important;transform:scale(1.25)!important}
 @media(max-width:600px){#missionRevealModal .missionRevealStage{min-height:72vh!important;padding:30px 16px 62px!important}#missionRevealModal .cinematicRevealCard{inset:30px 16px 62px!important}}
 @media(prefers-reduced-motion:reduce){#missionRevealModal .cinematicRevealCard{transition:none!important}}
+
+
+/* v2.3.7 cache-safe opaque reveal and always-available replay control */
+body.modalOpen{overflow:hidden!important}
+#missionRevealModal.missionRevealModal{
+  position:fixed!important;inset:0!important;z-index:2147483646!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;height:100%!important;margin:0!important;padding:18px!important;
+  background:#000!important;color:#fff!important;opacity:1!important;visibility:visible!important;
+  isolation:isolate!important;overflow:hidden!important;
+}
+#missionRevealModal.missionRevealModal::before{
+  content:"";position:absolute;inset:0;background:#000;z-index:-1;
+}
+#missionRevealModal.hidden{display:none!important;visibility:hidden!important}
+#missionRevealModal .missionRevealStage{
+  background:#080808!important;border:1px solid rgba(215,181,109,.45)!important;
+  box-shadow:0 24px 80px rgba(0,0,0,.95)!important;
+}
+.missionFooterActions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;align-items:center}
+#replayMissionRevealBtn{width:auto;margin:0}
+@media(max-width:620px){
+  .missionFooterActions{width:100%;justify-content:stretch}
+  #replayMissionRevealBtn,#missionCompleteBtn{width:100%}
+}

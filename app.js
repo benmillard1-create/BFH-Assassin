@@ -53,7 +53,7 @@ let briefingAuto=false;
 const briefingSlides=Array.from({length:18},(_,i)=>`briefing/slide-${String(i+1).padStart(2,"0")}.jpg`);
 let latestBoard=[];
 let latestHostPlayerId=null;
-function missionRevealKey(){return session?.gameId&&session?.playerId?`bfh_mission_revealed_${session.gameId}_${session.playerId}`:""}
+function missionRevealKey(){return session?.gameId&&session?.playerId?`bfh_mission_revealed_v237_${session.gameId}_${session.playerId}`:""}
 function creditsSeenKey(){return session?.gameId?`bfh_credits_seen_${session.gameId}`:""}
 
 function showView(id){views.forEach(v=>$(v).classList.toggle("hidden",v!==id))}
@@ -502,6 +502,7 @@ function init(){
  $("hideMissionBtn").onclick=switchPlayer;
  $("missionCompleteBtn").onclick=completeMission;
  $("revealMissionBtn").onclick=openMissionReveal;
+ $("replayMissionRevealBtn").onclick=openMissionReveal;
  $("missionRevealStage").onclick=advanceMissionReveal;
  $("missionRevealStage").onkeydown=event=>{if((event.key==="Enter"||event.key===" ")&&!event.target.closest("#closeMissionRevealBtn"))advanceMissionReveal(event)};
  $("closeMissionRevealBtn").onclick=event=>{event.preventDefault();event.stopPropagation();closeMissionReveal()};
