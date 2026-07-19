@@ -69,3 +69,41 @@
 @media(prefers-reduced-motion:reduce){.missionEnvelope,.envelopeFlap,.classifiedFolder{transition:none}.creditsModal.rolling .creditsRoll{animation-duration:1ms}}
 
 .feedList li{position:relative;padding-left:58px}.feedPersona{position:absolute;left:16px;top:14px;display:grid;place-items:center;width:30px;height:34px;border:1px solid #b88a34;border-radius:50%;background:#171717;font-size:1rem}.feedList li>span:not(.feedPersona){display:block}
+
+
+/* v2.3.1 envelope reliability and privacy fix; personas removed */
+.personaIdentity,.personaPortrait,.personaText,.sidePersona,.feedPersona{all:unset!important}
+.missionRevealModal{
+  z-index:99999!important;
+  background:#050505!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+}
+.missionRevealStage{
+  width:min(94vw,680px)!important;
+  min-height:min(88vh,680px)!important;
+  grid-template-rows:auto auto 1fr!important;
+  align-content:center!important;
+  gap:12px!important;
+}
+.revealEyebrow{position:static!important;margin:0;color:#e8c77e!important}
+.revealPrivacy{margin:0 0 18px;color:#c9c2b5;text-align:center;font-size:.92rem}
+.missionEnvelope{
+  display:block!important;
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent!important;
+  cursor:pointer!important;
+}
+.missionEnvelope *{pointer-events:none!important}
+.classifiedFolder{pointer-events:none!important}
+.missionRevealModal.opened .classifiedFolder{pointer-events:auto!important}
+.missionRevealModal.opened .missionEnvelope{visibility:hidden!important}
+.creditsCastRow{font-family:Georgia,serif;font-size:1.35rem;color:#f4e8ca;padding:8px 0}
+.feedList li{padding-left:18px!important}
+.boardList li:before{display:inline!important}
+@media(max-width:600px){
+  .missionRevealModal{padding:14px!important}
+  .missionRevealStage{min-height:92vh!important}
+  .missionEnvelope{width:min(90vw,520px)!important}
+  .classifiedFolder{width:min(90vw,570px)!important;min-height:320px!important}
+}

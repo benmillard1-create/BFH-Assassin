@@ -51,17 +51,8 @@ let briefingIndex=0;
 let briefingOnFinish=null;
 let briefingAuto=false;
 const briefingSlides=Array.from({length:18},(_,i)=>`briefing/slide-${String(i+1).padStart(2,"0")}.jpg`);
-const personas=[
- {title:"The Gentleman",icon:"🎩"},{title:"The Detective",icon:"🕵️"},{title:"The Lady",icon:"👒"},
- {title:"The Housekeeper",icon:"🧹"},{title:"The Butler",icon:"🍷"},{title:"The Actor",icon:"🎭"},
- {title:"The Professor",icon:"📚"},{title:"The Barrister",icon:"⚖️"},{title:"The Pianist",icon:"🎼"},
- {title:"The Socialite",icon:"🥂"},{title:"The Stable Master",icon:"🐎"},{title:"The Curator",icon:"🕯️"}
-];
 let latestBoard=[];
 let latestHostPlayerId=null;
-function stableHash(value){let h=2166136261;for(const ch of String(value)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
-function personaFor(playerId){return personas[stableHash(`${session?.gameId||"game"}:${playerId}`)%personas.length]}
-function portraitMarkup(playerId,name,compact=false){const p=personaFor(playerId);return `<span class="personaPortrait${compact?" compact":""}" aria-hidden="true"><span>${p.icon}</span></span><span class="personaText"><strong>${name}</strong><small>${p.title}</small></span>`}
 function missionRevealKey(){return session?.gameId&&session?.playerId?`bfh_mission_revealed_${session.gameId}_${session.playerId}`:""}
 function creditsSeenKey(){return session?.gameId?`bfh_credits_seen_${session.gameId}`:""}
 
@@ -181,8 +172,9 @@ function openMissionReveal(){
  $("missionRevealName").textContent=session?.playerName||"Agent";
  setTimeout(()=>$("missionEnvelopeBtn")?.focus(),80);
 }
-function revealMissionEnvelope(){
- const modal=$("missionRevealModal");modal.classList.add("opened");
+function revealMissionEnvelope(event){
+ event?.preventDefault();event?.stopPropagation();
+ const modal=$("missionRevealModal");if(!modal||modal.classList.contains("opened"))return;modal.classList.add("opened");
  const key=missionRevealKey();if(key)localStorage.setItem(key,"yes");
  setTimeout(()=>$("closeMissionRevealBtn")?.focus(),950);
 }
@@ -200,7 +192,7 @@ function openCredits(force=false){
  const host=latestBoard.find(x=>x.id===latestHostPlayerId);
  $("creditsHost").textContent=host?.name||session?.playerName||"The Host";
  const cast=$("creditsCast");cast.innerHTML="";
- latestBoard.forEach(x=>{const row=document.createElement("div");row.className="creditsCastRow";row.innerHTML=portraitMarkup(x.id,x.name,true);cast.append(row)});
+ latestBoard.forEach(x=>{const row=document.createElement("div");row.className="creditsCastRow";row.textContent=x.name;cast.append(row)});
  modal.classList.remove("hidden");document.body.classList.add("modalOpen");
  modal.classList.remove("rolling");void modal.offsetWidth;modal.classList.add("rolling");
  if(key)localStorage.setItem(key,"yes");
@@ -297,7 +289,7 @@ async function loadLobby(){
  $("lobbyCode").textContent=g.code;$("roleBadge").textContent=session.isHost?"HOST":"PLAYER";$("playerCount").textContent=ps.length;
  $("startGameBtn").classList.toggle("hidden",!session.isHost);$("waitingText").classList.toggle("hidden",session.isHost);
  $("deleteCurrentGameBtn")?.classList.toggle("hidden",!session.isHost);
- const l=$("playerList");l.innerHTML="";ps.forEach(p=>{const li=document.createElement("li"),identity=document.createElement("span"),status=document.createElement("small");identity.className="personaIdentity";identity.innerHTML=portraitMarkup(p.id,p.name,true);status.textContent=p.id===g.host_player_id?"Host":p.id===session.playerId?"You":"Ready";li.append(identity,status);l.append(li)});
+ const l=$("playerList");l.innerHTML="";ps.forEach(p=>{const li=document.createElement("li"),name=document.createElement("span"),status=document.createElement("small");name.className="name";name.textContent=p.name;status.textContent=p.id===g.host_player_id?"Host":p.id===session.playerId?"You":"Ready";li.append(name,status);l.append(li)});
 }
 
 async function dealMissions(event){
@@ -337,7 +329,6 @@ async function loadGame(){
  $("deleteCurrentGameInPlayBtn")?.classList.toggle("hidden",!session.isHost);
  $("missionPlayerName").textContent=p?.name||session.playerName;
  if($("sidePlayerName")) $("sidePlayerName").textContent=p?.name||session.playerName;
- if($("sidePersona")&&p){const persona=personaFor(p.id);$("sidePersona").innerHTML=`<span>${persona.icon}</span><small>${persona.title}</small>`}
  if($("gameCodeDisplay")) $("gameCodeDisplay").textContent=session.code||"------";
  const hasMission=!!m;$("missionWaiting").classList.toggle("hidden",hasMission);$("missionDetails").classList.toggle("hidden",!hasMission);maybeOpenMissionReveal(hasMission);
  if(m){$("targetName").textContent=m.players?.name||"Unknown";$("objectName").textContent=objectDisplayName(m.object_name);$("roomName").textContent=m.room_name}
@@ -349,7 +340,7 @@ async function loadGame(){
  latestBoard=board||[];const b=$("statusBoard");b.innerHTML="";(board||[]).forEach(x=>{
   const li=document.createElement("li"),n=document.createElement("span"),statuses=document.createElement("span");
   const life=document.createElement("small"),mission=document.createElement("small");
-  n.className="name personaIdentity";n.innerHTML=portraitMarkup(x.id,x.name,true);
+  n.className="name";n.textContent=x.name;
   statuses.className="statusIndicators";
   life.className=x.status==="ghost"?"statusPill eliminated":"statusPill alive";
   life.textContent=x.status==="ghost"?"👻 Ghost":"🟢 Alive";
@@ -357,7 +348,7 @@ async function loadGame(){
   mission.textContent=x.mission_completed?"🎯 Mission complete":"○ Mission pending";
   statuses.append(life,mission);li.append(n,statuses);b.append(li)
  });
- const f=$("eventFeed");f.innerHTML="";(events||[]).forEach(x=>{const li=document.createElement("li");const actor=(board||[]).find(player=>String(x.message||"").startsWith(player.name+" "));if(actor){const icon=document.createElement("span");icon.className="feedPersona";icon.textContent=personaFor(actor.id).icon;li.append(icon)}const text=document.createElement("span");text.textContent=x.message;li.append(text);const t=document.createElement("time");t.textContent=new Date(x.created_at).toLocaleString();li.append(t);f.append(li)});
+ const f=$("eventFeed");f.innerHTML="";(events||[]).forEach(x=>{const li=document.createElement("li");li.textContent=x.message;const t=document.createElement("time");t.textContent=new Date(x.created_at).toLocaleString();li.append(t);f.append(li)});
  const allComplete=(board||[]).length>=3&&(board||[]).every(x=>x.mission_completed);
  $("watchCreditsBtn")?.classList.toggle("hidden",!allComplete);
  if(allComplete)setTimeout(()=>openCredits(false),700);
@@ -478,7 +469,7 @@ function init(){
  $("revealMissionBtn").onclick=openMissionReveal;
  $("missionEnvelopeBtn").onclick=revealMissionEnvelope;
  $("closeMissionRevealBtn").onclick=closeMissionReveal;
- $("missionRevealModal").onclick=event=>{if(event.target.id==="missionRevealModal")closeMissionReveal()};
+ $("missionRevealModal").onclick=event=>{if(event.target.id==="missionRevealModal"&&event.currentTarget.classList.contains("opened"))closeMissionReveal()};
  $("watchCreditsBtn").onclick=()=>openCredits(true);
  $("closeCreditsBtn").onclick=closeCredits;
  $("creditsModal").onclick=event=>{if(event.target.id==="creditsModal")closeCredits()};
