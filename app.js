@@ -166,6 +166,13 @@ function openGameAfterBriefing(){
  playBriefing(openGame,true);
 }
 let missionRevealStep=0;
+function activateMissionPanel(){
+ document.querySelectorAll(".tab").forEach(tab=>tab.classList.toggle("active",tab.dataset.tab==="missionPanel"));
+ ["missionPanel","boardPanel","feedPanel"].forEach(id=>{
+  const panel=$(id);
+  if(panel)panel.classList.toggle("hidden",id!=="missionPanel");
+ });
+}
 function renderMissionRevealStep(){
  const modal=$("missionRevealModal");
  if(!modal)return;
@@ -182,6 +189,7 @@ function openMissionReveal(){
  $("revealObjectName").textContent=$("objectName")?.textContent||"—";
  $("revealRoomName").textContent=$("roomName")?.textContent||"—";
  modal.className="missionRevealModal";
+ modal.setAttribute("aria-hidden","false");
  document.body.classList.add("modalOpen");
  renderMissionRevealStep();
  setTimeout(()=>$("missionRevealStage")?.focus(),80);
@@ -198,8 +206,9 @@ function advanceMissionReveal(event){
 }
 function closeMissionReveal(){
  const key=missionRevealKey();if(key)localStorage.setItem(key,"yes");
+ activateMissionPanel();
  const modal=$("missionRevealModal");
- if(modal)modal.className="missionRevealModal hidden";
+ if(modal){modal.classList.add("hidden");modal.setAttribute("aria-hidden","true");}
  if($("briefingModal").classList.contains("hidden")&&$("rulesModal").classList.contains("hidden")&&$("floorPlanModal").classList.contains("hidden")&&$("creditsModal").classList.contains("hidden"))document.body.classList.remove("modalOpen");
  // The mission panel is already underneath; no navigation or reload is needed.
 }
