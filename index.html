@@ -202,30 +202,43 @@
   </div>
 
   <div id="missionRevealModal" class="missionRevealModal hidden" role="dialog" aria-modal="true" aria-labelledby="missionRevealTitle">
-    <div class="missionRevealStage">
-      <p class="revealEyebrow">PRIVATE COMMUNICATION FOR <span id="missionRevealName">AGENT</span></p><p class="revealPrivacy">Your mission remains hidden until you open the envelope.</p>
-      <button type="button" id="missionEnvelopeBtn" class="missionEnvelope" aria-label="Open classified mission envelope">
-        <span class="envelopeFlap"></span><span class="waxSeal">BFH</span><strong>TOP SECRET</strong><small>Tap to break the seal</small>
-      </button>
-      <div class="classifiedFolder" aria-live="polite">
-        <span class="folderTab">CLASSIFIED</span>
-        <div class="dossierHeader">
-          <span class="dossierStamp">EYES ONLY</span>
-          <div><p>BFH ASSASSIN</p><h2 id="missionRevealTitle">Mission dossier</h2></div>
-        </div>
-        <div class="revealCards" aria-label="Your secret mission">
-          <article class="revealCard targetCard" data-reveal-card="0">
-            <span class="revealCardIcon">◎</span><small>TARGET</small><strong id="revealTargetName">—</strong><p>Find this person discreetly.</p>
-          </article>
-          <article class="revealCard objectCard" data-reveal-card="1">
-            <span class="revealCardIcon">◆</span><small>OBJECT</small><strong id="revealObjectName">—</strong><p>Get your target to touch or hold it.</p>
-          </article>
-          <article class="revealCard roomCard" data-reveal-card="2">
-            <span class="revealCardIcon">⌖</span><small>LOCATION</small><strong id="revealRoomName">—</strong><p>The mission must happen here.</p>
-          </article>
-        </div>
-        <p id="missionRevealProgress" class="missionRevealProgress">Opening classified dossier…</p>
-        <button type="button" id="closeMissionRevealBtn" class="primary revealMissionAction" disabled>Begin mission</button>
+    <div id="missionRevealStage" class="missionRevealStage" tabindex="0" aria-live="polite">
+      <section class="cinematicRevealCard introCard active" data-mission-step="0">
+        <p class="revealEyebrow">PRIVATE COMMUNICATION FOR <span id="missionRevealName">AGENT</span></p>
+        <p class="classifiedMark">TOP SECRET</p>
+        <h2 id="missionRevealTitle">Mission Assignment</h2>
+        <p class="revealPrompt">Tap to continue</p>
+      </section>
+
+      <section class="cinematicRevealCard" data-mission-step="1">
+        <span class="cinematicIcon" aria-hidden="true">◎</span>
+        <p class="cinematicLabel">Target</p>
+        <strong id="revealTargetName">—</strong>
+        <p class="revealPrompt">Tap to continue</p>
+      </section>
+
+      <section class="cinematicRevealCard" data-mission-step="2">
+        <span class="cinematicIcon" aria-hidden="true">◆</span>
+        <p class="cinematicLabel">Object</p>
+        <strong id="revealObjectName">—</strong>
+        <p class="revealPrompt">Tap to continue</p>
+      </section>
+
+      <section class="cinematicRevealCard" data-mission-step="3">
+        <span class="cinematicIcon" aria-hidden="true">⌖</span>
+        <p class="cinematicLabel">Location</p>
+        <strong id="revealRoomName">—</strong>
+        <p class="revealPrompt">Tap to continue</p>
+      </section>
+
+      <section class="cinematicRevealCard finalCard" data-mission-step="4">
+        <p class="classifiedMark">Good luck</p>
+        <h2>Your mission is active</h2>
+        <button type="button" id="closeMissionRevealBtn" class="primary revealMissionAction">Begin Mission</button>
+      </section>
+
+      <div class="revealStepDots" aria-hidden="true">
+        <span class="active"></span><span></span><span></span><span></span><span></span>
       </div>
     </div>
   </div>

@@ -165,64 +165,48 @@ function openGameAfterBriefing(){
  if(hasSeenBriefing())return openGame();
  playBriefing(openGame,true);
 }
-let missionRevealTimers=[];
-function clearMissionRevealTimers(){missionRevealTimers.forEach(clearTimeout);missionRevealTimers=[]}
-function activateMissionPanel(){
- showView("gameView");
- document.querySelectorAll(".tab").forEach(tab=>tab.classList.toggle("active",tab.dataset.tab==="missionPanel"));
- document.querySelectorAll("#gameView .panel").forEach(panel=>panel.classList.toggle("hidden",panel.id!=="missionPanel"));
- const panel=$("missionPanel");
- if(panel){panel.scrollIntoView({block:"start"});panel.setAttribute("tabindex","-1");panel.focus({preventScroll:true})}
+let missionRevealStep=0;
+function renderMissionRevealStep(){
+ const modal=$("missionRevealModal");
+ if(!modal)return;
+ modal.querySelectorAll("[data-mission-step]").forEach(card=>card.classList.toggle("active",Number(card.dataset.missionStep)===missionRevealStep));
+ modal.querySelectorAll(".revealStepDots span").forEach((dot,index)=>dot.classList.toggle("active",index===missionRevealStep));
 }
 function openMissionReveal(){
  const modal=$("missionRevealModal");if(!modal)return;
- clearMissionRevealTimers();
- modal.className="missionRevealModal";
- document.body.classList.add("modalOpen");
+ // Put the real mission panel underneath the privacy overlay first.
+ activateMissionPanel();
+ missionRevealStep=0;
  $("missionRevealName").textContent=session?.playerName||"Agent";
  $("revealTargetName").textContent=$("targetName")?.textContent||"—";
  $("revealObjectName").textContent=$("objectName")?.textContent||"—";
  $("revealRoomName").textContent=$("roomName")?.textContent||"—";
- $("missionRevealProgress").textContent="Open the envelope to reveal your assignment.";
- $("closeMissionRevealBtn").disabled=true;
- setTimeout(()=>$('missionEnvelopeBtn')?.focus(),80);
+ modal.className="missionRevealModal";
+ document.body.classList.add("modalOpen");
+ renderMissionRevealStep();
+ setTimeout(()=>$("missionRevealStage")?.focus(),80);
 }
-function revealMissionEnvelope(event){
- event?.preventDefault();event?.stopPropagation();
- const modal=$("missionRevealModal");if(!modal||modal.classList.contains("opened")||modal.classList.contains("breaking"))return;
- modal.classList.add("breaking");
- const key=missionRevealKey();if(key)localStorage.setItem(key,"yes");
- missionRevealTimers.push(setTimeout(()=>{
-  modal.classList.add("opened");
-  $("missionRevealProgress").textContent="Target identified…";
- },520));
- missionRevealTimers.push(setTimeout(()=>modal.classList.add("card-1"),1050));
- missionRevealTimers.push(setTimeout(()=>{
-  modal.classList.add("card-2");
-  $("missionRevealProgress").textContent="Object confirmed…";
- },1780));
- missionRevealTimers.push(setTimeout(()=>{
-  modal.classList.add("cards-complete");
-  $("missionRevealProgress").textContent="Assignment complete. Memorise it, then begin.";
-  $("closeMissionRevealBtn").disabled=false;
-  $("closeMissionRevealBtn").focus();
- },2510));
-}
-function closeMissionReveal(goToMission=true){
- clearMissionRevealTimers();
- const modal=$("missionRevealModal");
- modal.className="missionRevealModal hidden";
- if($("briefingModal").classList.contains("hidden")&&$("rulesModal").classList.contains("hidden")&&$("floorPlanModal").classList.contains("hidden")&&$("creditsModal").classList.contains("hidden"))document.body.classList.remove("modalOpen");
- if(goToMission){
-  clearInterval(timer);
-  activateMissionPanel();
-  loadGame();
-  timer=setInterval(loadGame,2500);
+function advanceMissionReveal(event){
+ event?.preventDefault();
+ const target=event?.target;
+ if(target?.closest?.("#closeMissionRevealBtn"))return;
+ if(missionRevealStep<4){
+  missionRevealStep+=1;
+  renderMissionRevealStep();
+  if(missionRevealStep===4)setTimeout(()=>$("closeMissionRevealBtn")?.focus(),80);
  }
+}
+function closeMissionReveal(){
+ const key=missionRevealKey();if(key)localStorage.setItem(key,"yes");
+ const modal=$("missionRevealModal");
+ if(modal)modal.className="missionRevealModal hidden";
+ if($("briefingModal").classList.contains("hidden")&&$("rulesModal").classList.contains("hidden")&&$("floorPlanModal").classList.contains("hidden")&&$("creditsModal").classList.contains("hidden"))document.body.classList.remove("modalOpen");
+ // The mission panel is already underneath; no navigation or reload is needed.
 }
 function maybeOpenMissionReveal(hasMission){
  const key=missionRevealKey();if(hasMission&&key&&localStorage.getItem(key)!=="yes"&&$("missionRevealModal").classList.contains("hidden"))setTimeout(openMissionReveal,300);
 }
+
 function openCredits(force=false){
  if(!latestBoard.length)return;
  const modal=$("creditsModal");if(!modal)return;
@@ -509,9 +493,9 @@ function init(){
  $("hideMissionBtn").onclick=switchPlayer;
  $("missionCompleteBtn").onclick=completeMission;
  $("revealMissionBtn").onclick=openMissionReveal;
- $("missionEnvelopeBtn").onclick=revealMissionEnvelope;
- $("closeMissionRevealBtn").onclick=()=>closeMissionReveal(true);
- $("missionRevealModal").onclick=event=>{if(event.target.id==="missionRevealModal"&&event.currentTarget.classList.contains("cards-complete"))closeMissionReveal(true)};
+ $("missionRevealStage").onclick=advanceMissionReveal;
+ $("missionRevealStage").onkeydown=event=>{if((event.key==="Enter"||event.key===" ")&&!event.target.closest("#closeMissionRevealBtn"))advanceMissionReveal(event)};
+ $("closeMissionRevealBtn").onclick=event=>{event.preventDefault();event.stopPropagation();closeMissionReveal()};
  $("watchCreditsBtn").onclick=()=>openCredits(true);
  $("closeCreditsBtn").onclick=closeCredits;
  $("creditsModal").onclick=event=>{if(event.target.id==="creditsModal")closeCredits()};
