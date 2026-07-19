@@ -51,6 +51,19 @@ let briefingIndex=0;
 let briefingOnFinish=null;
 let briefingAuto=false;
 const briefingSlides=Array.from({length:18},(_,i)=>`briefing/slide-${String(i+1).padStart(2,"0")}.jpg`);
+const personas=[
+ {title:"The Gentleman",icon:"🎩"},{title:"The Detective",icon:"🕵️"},{title:"The Lady",icon:"👒"},
+ {title:"The Housekeeper",icon:"🧹"},{title:"The Butler",icon:"🍷"},{title:"The Actor",icon:"🎭"},
+ {title:"The Professor",icon:"📚"},{title:"The Barrister",icon:"⚖️"},{title:"The Pianist",icon:"🎼"},
+ {title:"The Socialite",icon:"🥂"},{title:"The Stable Master",icon:"🐎"},{title:"The Curator",icon:"🕯️"}
+];
+let latestBoard=[];
+let latestHostPlayerId=null;
+function stableHash(value){let h=2166136261;for(const ch of String(value)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function personaFor(playerId){return personas[stableHash(`${session?.gameId||"game"}:${playerId}`)%personas.length]}
+function portraitMarkup(playerId,name,compact=false){const p=personaFor(playerId);return `<span class="personaPortrait${compact?" compact":""}" aria-hidden="true"><span>${p.icon}</span></span><span class="personaText"><strong>${name}</strong><small>${p.title}</small></span>`}
+function missionRevealKey(){return session?.gameId&&session?.playerId?`bfh_mission_revealed_${session.gameId}_${session.playerId}`:""}
+function creditsSeenKey(){return session?.gameId?`bfh_credits_seen_${session.gameId}`:""}
 
 function showView(id){views.forEach(v=>$(v).classList.toggle("hidden",v!==id))}
 function msg(t,e=false,stay=false){const b=$("message");b.textContent=t;b.classList.toggle("error",e);b.classList.remove("hidden");if(!stay)setTimeout(()=>b.classList.add("hidden"),8000)}
@@ -161,6 +174,43 @@ function openGameAfterBriefing(){
  if(hasSeenBriefing())return openGame();
  playBriefing(openGame,true);
 }
+function openMissionReveal(){
+ const modal=$("missionRevealModal");if(!modal)return;
+ modal.classList.remove("hidden");document.body.classList.add("modalOpen");
+ modal.classList.remove("opened");
+ $("missionRevealName").textContent=session?.playerName||"Agent";
+ setTimeout(()=>$("missionEnvelopeBtn")?.focus(),80);
+}
+function revealMissionEnvelope(){
+ const modal=$("missionRevealModal");modal.classList.add("opened");
+ const key=missionRevealKey();if(key)localStorage.setItem(key,"yes");
+ setTimeout(()=>$("closeMissionRevealBtn")?.focus(),950);
+}
+function closeMissionReveal(){
+ $("missionRevealModal").classList.add("hidden");
+ if($("briefingModal").classList.contains("hidden")&&$("rulesModal").classList.contains("hidden")&&$("floorPlanModal").classList.contains("hidden")&&$("creditsModal").classList.contains("hidden"))document.body.classList.remove("modalOpen");
+}
+function maybeOpenMissionReveal(hasMission){
+ const key=missionRevealKey();if(hasMission&&key&&localStorage.getItem(key)!=="yes"&&$("missionRevealModal").classList.contains("hidden"))setTimeout(openMissionReveal,300);
+}
+function openCredits(force=false){
+ if(!latestBoard.length)return;
+ const modal=$("creditsModal");if(!modal)return;
+ const key=creditsSeenKey();if(!force&&key&&localStorage.getItem(key)==="yes")return;
+ const host=latestBoard.find(x=>x.id===latestHostPlayerId);
+ $("creditsHost").textContent=host?.name||session?.playerName||"The Host";
+ const cast=$("creditsCast");cast.innerHTML="";
+ latestBoard.forEach(x=>{const row=document.createElement("div");row.className="creditsCastRow";row.innerHTML=portraitMarkup(x.id,x.name,true);cast.append(row)});
+ modal.classList.remove("hidden");document.body.classList.add("modalOpen");
+ modal.classList.remove("rolling");void modal.offsetWidth;modal.classList.add("rolling");
+ if(key)localStorage.setItem(key,"yes");
+ $("creditsAudio").currentTime=0;$("creditsAudio").volume=.62;$("creditsAudio").play().catch(()=>{});
+}
+function closeCredits(){
+ const audio=$("creditsAudio");audio.pause();audio.currentTime=0;
+ $("creditsModal").classList.add("hidden");
+ if($("briefingModal").classList.contains("hidden")&&$("rulesModal").classList.contains("hidden")&&$("floorPlanModal").classList.contains("hidden")&&$("missionRevealModal").classList.contains("hidden"))document.body.classList.remove("modalOpen");
+}
 function validPin(v){return /^[0-9]{4}$/.test(v)}
 function randCode(){const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";return Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join("")}
 function shuffle(a){
@@ -247,7 +297,7 @@ async function loadLobby(){
  $("lobbyCode").textContent=g.code;$("roleBadge").textContent=session.isHost?"HOST":"PLAYER";$("playerCount").textContent=ps.length;
  $("startGameBtn").classList.toggle("hidden",!session.isHost);$("waitingText").classList.toggle("hidden",session.isHost);
  $("deleteCurrentGameBtn")?.classList.toggle("hidden",!session.isHost);
- const l=$("playerList");l.innerHTML="";ps.forEach(p=>{const li=document.createElement("li"),n=document.createElement("span"),s=document.createElement("small");n.className="name";n.textContent=p.name;s.textContent=p.id===g.host_player_id?"Host":p.id===session.playerId?"You":"Ready";li.append(n,s);l.append(li)});
+ const l=$("playerList");l.innerHTML="";ps.forEach(p=>{const li=document.createElement("li"),identity=document.createElement("span"),status=document.createElement("small");identity.className="personaIdentity";identity.innerHTML=portraitMarkup(p.id,p.name,true);status.textContent=p.id===g.host_player_id?"Host":p.id===session.playerId?"You":"Ready";li.append(identity,status);l.append(li)});
 }
 
 async function dealMissions(event){
@@ -283,22 +333,23 @@ async function loadGame(){
   sb.from("game_events").select("id,message,created_at").eq("game_id",session.gameId).order("created_at",{ascending:false}).limit(40)
  ]);
  if(ge||pe||be||ee)return msg((ge||pe||be||ee).message,true);
- session.isHost=g?.host_player_id===session.playerId;save(session);
+ session.isHost=g?.host_player_id===session.playerId;latestHostPlayerId=g?.host_player_id||null;save(session);
  $("deleteCurrentGameInPlayBtn")?.classList.toggle("hidden",!session.isHost);
  $("missionPlayerName").textContent=p?.name||session.playerName;
  if($("sidePlayerName")) $("sidePlayerName").textContent=p?.name||session.playerName;
+ if($("sidePersona")&&p){const persona=personaFor(p.id);$("sidePersona").innerHTML=`<span>${persona.icon}</span><small>${persona.title}</small>`}
  if($("gameCodeDisplay")) $("gameCodeDisplay").textContent=session.code||"------";
- const hasMission=!!m;$("missionWaiting").classList.toggle("hidden",hasMission);$("missionDetails").classList.toggle("hidden",!hasMission);
+ const hasMission=!!m;$("missionWaiting").classList.toggle("hidden",hasMission);$("missionDetails").classList.toggle("hidden",!hasMission);maybeOpenMissionReveal(hasMission);
  if(m){$("targetName").textContent=m.players?.name||"Unknown";$("objectName").textContent=objectDisplayName(m.object_name);$("roomName").textContent=m.room_name}
  const completed=!!m?.completed;const ghost=p?.status==="ghost";
  $("missionStatusBadge").textContent=completed?"COMPLETE":ghost?"GHOST":"ACTIVE";
  if($("sideStatus")) $("sideStatus").textContent=completed?"✓ Mission complete":ghost?"● Ghost":"● Active";
  $("missionHint").textContent=completed?"Your mission is complete.":ghost?"You are a ghost, but your mission is still active.":"Keep this screen private.";
  $("missionCompleteBtn").classList.toggle("hidden",!m||completed);
- const b=$("statusBoard");b.innerHTML="";(board||[]).forEach(x=>{
+ latestBoard=board||[];const b=$("statusBoard");b.innerHTML="";(board||[]).forEach(x=>{
   const li=document.createElement("li"),n=document.createElement("span"),statuses=document.createElement("span");
   const life=document.createElement("small"),mission=document.createElement("small");
-  n.className="name";n.textContent=x.name;
+  n.className="name personaIdentity";n.innerHTML=portraitMarkup(x.id,x.name,true);
   statuses.className="statusIndicators";
   life.className=x.status==="ghost"?"statusPill eliminated":"statusPill alive";
   life.textContent=x.status==="ghost"?"👻 Ghost":"🟢 Alive";
@@ -306,7 +357,10 @@ async function loadGame(){
   mission.textContent=x.mission_completed?"🎯 Mission complete":"○ Mission pending";
   statuses.append(life,mission);li.append(n,statuses);b.append(li)
  });
- const f=$("eventFeed");f.innerHTML="";(events||[]).forEach(x=>{const li=document.createElement("li");li.textContent=x.message;const t=document.createElement("time");t.textContent=new Date(x.created_at).toLocaleString();li.append(t);f.append(li)});
+ const f=$("eventFeed");f.innerHTML="";(events||[]).forEach(x=>{const li=document.createElement("li");const actor=(board||[]).find(player=>String(x.message||"").startsWith(player.name+" "));if(actor){const icon=document.createElement("span");icon.className="feedPersona";icon.textContent=personaFor(actor.id).icon;li.append(icon)}const text=document.createElement("span");text.textContent=x.message;li.append(text);const t=document.createElement("time");t.textContent=new Date(x.created_at).toLocaleString();li.append(t);f.append(li)});
+ const allComplete=(board||[]).length>=3&&(board||[]).every(x=>x.mission_completed);
+ $("watchCreditsBtn")?.classList.toggle("hidden",!allComplete);
+ if(allComplete)setTimeout(()=>openCredits(false),700);
 }
 
 async function completeMission(event){
@@ -421,6 +475,13 @@ function init(){
  $("leaveGameBtn").onclick=logout;
  $("hideMissionBtn").onclick=switchPlayer;
  $("missionCompleteBtn").onclick=completeMission;
+ $("revealMissionBtn").onclick=openMissionReveal;
+ $("missionEnvelopeBtn").onclick=revealMissionEnvelope;
+ $("closeMissionRevealBtn").onclick=closeMissionReveal;
+ $("missionRevealModal").onclick=event=>{if(event.target.id==="missionRevealModal")closeMissionReveal()};
+ $("watchCreditsBtn").onclick=()=>openCredits(true);
+ $("closeCreditsBtn").onclick=closeCredits;
+ $("creditsModal").onclick=event=>{if(event.target.id==="creditsModal")closeCredits()};
  document.querySelectorAll("[data-floor-plan]").forEach(button=>{button.onclick=openFloorPlan;button.onkeydown=event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openFloorPlan()}}});
  document.querySelectorAll("[data-open-tab]").forEach(button=>button.onclick=()=>{if(!session?.gameId)return;openGame();setTimeout(()=>document.querySelector(`.tab[data-tab="${button.dataset.openTab}"]`)?.click(),0)});
  $("openRulesBtn").onclick=openRules;
@@ -436,7 +497,9 @@ function init(){
  $("floorPlanModal").onclick=event=>{if(event.target.id==="floorPlanModal")closeFloorPlan()};
  document.addEventListener("keydown",event=>{
   if(event.key!=="Escape")return;
-  if(!$("briefingModal").classList.contains("hidden")&&!briefingAuto)finishBriefing();
+  if(!$("creditsModal").classList.contains("hidden"))closeCredits();
+  else if(!$("missionRevealModal").classList.contains("hidden"))closeMissionReveal();
+  else if(!$("briefingModal").classList.contains("hidden")&&!briefingAuto)finishBriefing();
   else if(!$("rulesModal").classList.contains("hidden"))closeRules();
   else if(!$("floorPlanModal").classList.contains("hidden"))closeFloorPlan();
  });

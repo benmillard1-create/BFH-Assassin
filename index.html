@@ -125,10 +125,10 @@
           <span class="sideLabel">GAME CODE</span><div class="staticCode" id="gameCodeDisplay">------</div>
           <div class="statusLine"><span class="statusDot"></span> Game in progress</div>
           <div class="sideDivider"></div>
-          <span class="sideLabel">YOUR AGENT</span><h3 id="sidePlayerName">Agent</h3>
+          <span class="sideLabel">YOUR AGENT</span><div id="sidePersona" class="sidePersona"><span>🎩</span><small>The Gentleman</small></div><h3 id="sidePlayerName">Agent</h3>
           <span class="sideLabel spaced">STATUS</span><div id="sideStatus" class="roleDisplay">● Active</div>
           <button type="button" data-floor-plan class="goldOutline">▱ View Floor Plan</button>
-          <button type="button" id="hideMissionBtn" class="darkButton">Hide / switch player</button>
+          <button type="button" id="revealMissionBtn" class="goldOutline">✉ Reveal mission</button><button type="button" id="watchCreditsBtn" class="darkButton hidden">🎬 Watch end credits</button><button type="button" id="hideMissionBtn" class="darkButton">Hide / switch player</button>
           <button type="button" id="deleteCurrentGameInPlayBtn" class="textDanger hidden">Delete this game</button>
         </aside>
         <section class="contentPanel">
@@ -153,7 +153,7 @@
           <section id="feedPanel" class="panel hidden"><div class="contentHeading"><div><span class="eyebrow">LIVE UPDATES</span><h2>Event feed</h2><p>The latest activity from the operation.</p></div></div><ul id="eventFeed" class="feedList"></ul></section>
         </section>
       </section>
-      <p class="version">BFH ASSASSIN v2.1</p>
+      <p class="version">BFH ASSASSIN v2.3</p>
     </main>
   </div>
 
@@ -201,6 +201,38 @@
     </div>
   </div>
 
+  <div id="missionRevealModal" class="missionRevealModal hidden" role="dialog" aria-modal="true" aria-labelledby="missionRevealTitle">
+    <div class="missionRevealStage">
+      <p class="revealEyebrow">PRIVATE COMMUNICATION FOR <span id="missionRevealName">AGENT</span></p>
+      <button type="button" id="missionEnvelopeBtn" class="missionEnvelope" aria-label="Open classified mission envelope">
+        <span class="envelopeFlap"></span><span class="waxSeal">BFH</span><strong>TOP SECRET</strong><small>Tap to break the seal</small>
+      </button>
+      <div class="classifiedFolder">
+        <span class="folderTab">CLASSIFIED</span>
+        <h2 id="missionRevealTitle">Your mission is ready</h2>
+        <p>Target. Object. Location.</p>
+        <p class="missionAccepted">MISSION ACCEPTED</p>
+        <button type="button" id="closeMissionRevealBtn" class="primary">View mission</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="creditsModal" class="creditsModal hidden" role="dialog" aria-modal="true" aria-labelledby="creditsTitle">
+    <button type="button" id="closeCreditsBtn" class="creditsClose" aria-label="Close end credits">✕</button>
+    <div class="creditsRoll">
+      <p class="creditsKicker">BIG FAMILY HOLIDAY 2026 PRESENTS</p>
+      <h2 id="creditsTitle">BFH ASSASSIN</h2>
+      <p class="creditsLocation">Filmed on location at<br><strong>Ludbrook Manor</strong></p>
+      <h3>Starring</h3>
+      <div id="creditsCast" class="creditsCast"></div>
+      <h3>Mission Controller</h3>
+      <p id="creditsHost" class="creditsHost">The Host</p>
+      <p class="creditsFinal">UNTIL NEXT YEAR…</p>
+      <p class="creditsTrust">TRUST<br><strong>NO ONE.</strong></p>
+    </div>
+    <audio id="creditsAudio" preload="auto" src="assets/audio/ludbrook-manor-assassins.mp3"></audio>
+  </div>
+
   <div id="floorPlanModal" class="floorPlanModal hidden" role="dialog" aria-modal="true" aria-labelledby="floorPlanTitle">
     <div class="floorPlanWindow">
       <div class="floorPlanHeader"><div><span class="eyebrow">LOCATION GUIDE</span><h2 id="floorPlanTitle">Ludbrook Manor</h2><p>Floor plan and outdoor mission areas</p></div><button type="button" id="closeFloorPlanBtn" class="closeFloorPlan" aria-label="Close floor plan">✕</button></div>
@@ -210,6 +242,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="app.js?v=2.2"></script>
+  <script src="app.js?v=2.3"></script>
 </body>
 </html>
