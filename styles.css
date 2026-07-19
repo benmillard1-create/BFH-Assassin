@@ -255,3 +255,76 @@
   pointer-events:none!important;
 }
 #missionRevealModal .missionEnvelope{flex:0 0 auto!important;cursor:pointer!important}
+
+/* v2.3.4 polished classified dossier and dependable mission navigation */
+#missionRevealModal .missionRevealStage{perspective:1400px!important}
+#missionRevealModal .missionEnvelope{
+  overflow:visible!important;
+  border:1px solid #9a7545!important;
+  border-radius:10px!important;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.13),transparent 32%),
+    repeating-linear-gradient(0deg,rgba(78,47,20,.035) 0 1px,transparent 1px 4px),
+    linear-gradient(145deg,#c49a62,#936538)!important;
+  box-shadow:0 28px 80px #000c,inset 0 1px #f3d8a3,inset 0 -18px 34px #5c351f33!important;
+}
+#missionRevealModal .missionEnvelope strong{font-size:clamp(1.35rem,5vw,2.55rem)!important;text-shadow:0 1px #f0d5a4}
+#missionRevealModal .missionEnvelope small{letter-spacing:.08em}
+#missionRevealModal .waxSeal{
+  width:82px!important;height:82px!important;
+  border:3px solid #bd6656!important;
+  outline:2px solid #6b130f!important;
+  box-shadow:0 9px 22px #0009,inset 0 0 0 5px #7b1714,inset 0 0 18px #e58e7366!important;
+}
+#missionRevealModal.breaking .waxSeal{animation:sealBreak .48s cubic-bezier(.2,.9,.2,1) forwards!important}
+#missionRevealModal.breaking .missionEnvelope{animation:envelopeLift .55s ease both}
+@keyframes sealBreak{40%{transform:translate(-50%,-50%) rotate(-8deg) scale(1.08)}100%{transform:translate(-50%,-50%) rotate(18deg) scale(.05);opacity:0}}
+@keyframes envelopeLift{50%{transform:translateY(-8px) rotateX(2deg)}100%{transform:translateY(0)}}
+#missionRevealModal .classifiedFolder{
+  min-height:unset!important;
+  padding:46px 28px 28px!important;
+  border:1px solid #9a8052!important;
+  border-radius:8px!important;
+  background:
+    repeating-linear-gradient(0deg,rgba(55,39,18,.028) 0 1px,transparent 1px 5px),
+    linear-gradient(145deg,#efe5cc,#cdbd95)!important;
+  color:#231b11!important;
+  box-shadow:0 30px 90px #000d,inset 0 0 0 5px #dfd0aa!important;
+  text-align:left!important;
+}
+#missionRevealModal .folderTab{background:#c5aa73!important;color:#2a2114!important}
+.dossierHeader{display:flex;align-items:center;gap:15px;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid #8f7547}
+.dossierHeader p{margin:0!important;font-size:.72rem!important;font-weight:900;letter-spacing:.17em;color:#6e5a35}
+.dossierHeader h2{margin:3px 0 0!important;font-size:clamp(1.65rem,5vw,2.5rem)!important}
+.dossierStamp{display:grid;place-items:center;min-width:80px;min-height:56px;padding:8px;border:3px double #82251f;transform:rotate(-5deg);color:#82251f;font:900 .72rem/1.1 Georgia,serif;letter-spacing:.08em;text-align:center}
+.revealCards{display:grid;gap:11px}
+.revealCard{
+  display:grid;grid-template-columns:48px minmax(0,1fr);grid-template-rows:auto auto auto;
+  column-gap:13px;padding:14px 16px;border:1px solid #aa956b;border-left:5px solid #725523;border-radius:7px;
+  background:#f7f0dc;box-shadow:0 5px 14px #49351617;
+  opacity:0;transform:translateY(16px) scale(.98);visibility:hidden;
+}
+.revealCardIcon{grid-row:1/4;align-self:center;display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#282116;color:#e8d5a4;font-size:1.45rem}
+.revealCard small{font-size:.67rem;font-weight:900;letter-spacing:.16em;color:#745c2b}
+.revealCard strong{display:block;min-width:0;margin:2px 0;font-family:Georgia,serif;font-size:clamp(1.15rem,4vw,1.55rem);overflow-wrap:anywhere}
+.revealCard p{margin:0!important;font-size:.84rem!important;color:#665b49}
+#missionRevealModal.card-1 .revealCard[data-reveal-card="0"],
+#missionRevealModal.card-2 .revealCard[data-reveal-card="0"],#missionRevealModal.card-2 .revealCard[data-reveal-card="1"],
+#missionRevealModal.cards-complete .revealCard{visibility:visible;animation:dossierCardIn .52s cubic-bezier(.2,.8,.2,1) forwards}
+#missionRevealModal.card-2 .revealCard[data-reveal-card="1"]{animation-delay:.05s}
+#missionRevealModal.cards-complete .revealCard[data-reveal-card="2"]{animation-delay:.05s}
+@keyframes dossierCardIn{to{opacity:1;transform:translateY(0) scale(1)}}
+.missionRevealProgress{margin:15px 0 10px!important;text-align:center!important;font-size:.78rem!important;font-weight:900;letter-spacing:.1em;color:#725d34}
+.revealMissionAction{display:block!important;width:min(100%,250px)!important;margin:0 auto!important;transition:opacity .25s ease,transform .25s ease!important}
+.revealMissionAction:disabled{opacity:.42!important;cursor:wait!important;transform:translateY(3px)}
+#missionRevealModal.cards-complete .revealMissionAction{animation:buttonReveal .35s ease both}
+@keyframes buttonReveal{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@media(max-width:600px){
+  #missionRevealModal .classifiedFolder{padding:38px 16px 20px!important}
+  .dossierHeader{gap:10px}.dossierStamp{min-width:66px;min-height:50px;font-size:.62rem}
+  .revealCard{grid-template-columns:39px minmax(0,1fr);column-gap:10px;padding:11px 12px}
+  .revealCardIcon{width:38px;height:38px;font-size:1.15rem}
+}
+@media(prefers-reduced-motion:reduce){
+  #missionRevealModal.breaking .waxSeal,#missionRevealModal.breaking .missionEnvelope,.revealCard,#missionRevealModal.cards-complete .revealMissionAction{animation-duration:1ms!important;animation-delay:0ms!important}
+}

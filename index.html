@@ -153,7 +153,7 @@
           <section id="feedPanel" class="panel hidden"><div class="contentHeading"><div><span class="eyebrow">LIVE UPDATES</span><h2>Event feed</h2><p>The latest activity from the operation.</p></div></div><ul id="eventFeed" class="feedList"></ul></section>
         </section>
       </section>
-      <p class="version">BFH ASSASSIN v2.3.3</p>
+      <p class="version">BFH ASSASSIN v2.3.4</p>
     </main>
   </div>
 
@@ -207,12 +207,25 @@
       <button type="button" id="missionEnvelopeBtn" class="missionEnvelope" aria-label="Open classified mission envelope">
         <span class="envelopeFlap"></span><span class="waxSeal">BFH</span><strong>TOP SECRET</strong><small>Tap to break the seal</small>
       </button>
-      <div class="classifiedFolder">
+      <div class="classifiedFolder" aria-live="polite">
         <span class="folderTab">CLASSIFIED</span>
-        <h2 id="missionRevealTitle">Your mission is ready</h2>
-        <p>Target. Object. Location.</p>
-        <p class="missionAccepted">MISSION ACCEPTED</p>
-        <button type="button" id="closeMissionRevealBtn" class="primary">View mission</button>
+        <div class="dossierHeader">
+          <span class="dossierStamp">EYES ONLY</span>
+          <div><p>BFH ASSASSIN</p><h2 id="missionRevealTitle">Mission dossier</h2></div>
+        </div>
+        <div class="revealCards" aria-label="Your secret mission">
+          <article class="revealCard targetCard" data-reveal-card="0">
+            <span class="revealCardIcon">◎</span><small>TARGET</small><strong id="revealTargetName">—</strong><p>Find this person discreetly.</p>
+          </article>
+          <article class="revealCard objectCard" data-reveal-card="1">
+            <span class="revealCardIcon">◆</span><small>OBJECT</small><strong id="revealObjectName">—</strong><p>Get your target to touch or hold it.</p>
+          </article>
+          <article class="revealCard roomCard" data-reveal-card="2">
+            <span class="revealCardIcon">⌖</span><small>LOCATION</small><strong id="revealRoomName">—</strong><p>The mission must happen here.</p>
+          </article>
+        </div>
+        <p id="missionRevealProgress" class="missionRevealProgress">Opening classified dossier…</p>
+        <button type="button" id="closeMissionRevealBtn" class="primary revealMissionAction" disabled>Begin mission</button>
       </div>
     </div>
   </div>
