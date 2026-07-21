@@ -167,7 +167,7 @@ function openGameAfterBriefing(){
 }
 let missionRevealStep=0;
 function activateMissionPanel(){
- document.querySelectorAll(".tab").forEach(tab=>tab.classList.toggle("active",tab.dataset.tab==="missionPanel"));
+ document.querySelectorAll(".tab[data-tab]").forEach(tab=>tab.classList.toggle("active",tab.dataset.tab==="missionPanel"));
  ["missionPanel","boardPanel","feedPanel"].forEach(id=>{
   const panel=$(id);
   if(panel)panel.classList.toggle("hidden",id!=="missionPanel");
@@ -512,6 +512,7 @@ function init(){
  document.querySelectorAll("[data-floor-plan]").forEach(button=>{button.onclick=openFloorPlan;button.onkeydown=event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openFloorPlan()}}});
  document.querySelectorAll("[data-open-tab]").forEach(button=>button.onclick=()=>{if(!session?.gameId)return;openGame();setTimeout(()=>document.querySelector(`.tab[data-tab="${button.dataset.openTab}"]`)?.click(),0)});
  $("openRulesBtn").onclick=openRules;
+ $("inGameRulesBtn").onclick=openRules;
  $("openBriefingBtn").onclick=()=>playBriefing(null,false);
  $("briefingReplayBtn").onclick=replayBriefing;
  $("briefingTapBtn").onclick=tapToBeginBriefing;
@@ -531,9 +532,9 @@ function init(){
   else if(!$("floorPlanModal").classList.contains("hidden"))closeFloorPlan();
  });
 
- document.querySelectorAll(".tab").forEach(tab=>{
+ document.querySelectorAll(".tab[data-tab]").forEach(tab=>{
   tab.onclick=()=>{
-   document.querySelectorAll(".tab").forEach(item=>item.classList.remove("active"));
+   document.querySelectorAll(".tab[data-tab]").forEach(item=>item.classList.remove("active"));
    tab.classList.add("active");
    ["missionPanel","boardPanel","feedPanel"].forEach(id=>{
     $(id).classList.toggle("hidden",id!==tab.dataset.tab);
